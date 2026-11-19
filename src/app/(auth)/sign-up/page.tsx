@@ -1,5 +1,7 @@
+"use client";
+
 import { signUp } from '@/lib/auth-client';
-import React, { FormEvent } from 'react';
+import { FormEvent } from 'react';
 import { toast } from 'sonner';
 
 const SignUpPage = () => {

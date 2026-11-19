@@ -15,7 +15,6 @@ import {
   UserRound,
 } from "lucide-react";
 import { cn } from "cn";
-
 import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,8 +44,7 @@ function ThemeToggle() {
       variant="ghost"
       size="icon-sm"
       aria-label="Toggle theme"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-    >
+      onClick={() => setTheme(isDark ? "light" : "dark")}>
       {isDark ? <Moon className="size-4" /> : <Sun className="size-4" />}
     </Button>
   );
@@ -61,7 +59,6 @@ export default function SiteHeader() {
   const user = session?.user ?? null;
   const role = user ? (user.role as UserRole) : null;
 
-  // Dashboard is only offered to signed-in users (per spec).
   const navLinks = user ? [...baseNavLinks, dashboardLink] : baseNavLinks;
 
   const isActive = (href: string) =>
@@ -94,7 +91,6 @@ export default function SiteHeader() {
           )}
         </div>
 
-        {/* Centered primary navigation (desktop) */}
         <nav className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center lg:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
@@ -104,26 +100,29 @@ export default function SiteHeader() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-16 items-center border-b-2 px-3 text-sm font-medium transition-colors",
+                  "flex h-16 items-center px-3 text-sm font-medium transition-colors",
                   active
-                    ? "border-primary font-semibold text-primary-container"
-                    : "border-transparent text-muted-foreground hover:text-secondary"
-                )}
-              >
-                {link.label}
+                    ? "font-semibold text-primary-container"
+                    : "text-muted-foreground hover:text-secondary"
+                )}>
+                <span
+                  className={cn(
+                    "flex items-center border-b-2 pb-1",
+                    active ? "border-primary" : "border-transparent"
+                  )}>
+                  {link.label}
+                </span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Actions */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
           <Button
             variant="ghost"
             size="icon-sm"
             aria-label="Search tuitions"
-            render={<Link href="/tuitions" />}
-          >
+            render={<Link href="/tuitions" />}>
             <Search />
           </Button>
           <ThemeToggle />
@@ -132,7 +131,6 @@ export default function SiteHeader() {
             <AuthUser />
           </span>
 
-          {/* Mobile menu */}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger
               render={
@@ -206,8 +204,7 @@ export default function SiteHeader() {
                       onClick={() => {
                         setMenuOpen(false);
                         router.push("/dashboard");
-                      }}
-                    >
+                      }}>
                       <LayoutDashboard />
                       Dashboard
                     </Button>
@@ -217,16 +214,14 @@ export default function SiteHeader() {
                       onClick={() => {
                         setMenuOpen(false);
                         router.push("/dashboard/profile");
-                      }}
-                    >
+                      }}>
                       <UserRound />
                       Update Profile
                     </Button>
                     <Button
                       variant="ghost"
                       className="justify-start gap-2.5 text-destructive hover:text-destructive"
-                      onClick={handleSignOut}
-                    >
+                      onClick={handleSignOut}>
                       <LogOut />
                       Sign Out
                     </Button>
@@ -246,8 +241,7 @@ export default function SiteHeader() {
                       onClick={() => {
                         setMenuOpen(false);
                         router.push("/sign-up");
-                      }}
-                    >
+                      }}>
                       Sign Up
                     </Button>
                   </>

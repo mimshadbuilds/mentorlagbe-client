@@ -58,16 +58,16 @@ export default function HowItWorks() {
         <section className="w-full bg-surface-container-low py-8">
             <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
                 <div className="mx-auto mb-8 max-w-2xl text-center">
-                <span className="inline-block rounded-full bg-secondary-container/60 px-4 py-1 text-[11px] leading-[14px] font-semibold tracking-wider text-secondary uppercase">
-                    Institutional Workflow
-                </span>
-                <h2 className="font-display mt-1 mb-1 text-[2rem] leading-10 font-bold tracking-tight text-primary-container">
-                    How MentorLagbe Works
-                </h2>
-                <p className="text-[15px] leading-6 text-on-surface-variant">
-                    Designed with verified credentials, zero hourly billing, and
-                    monthly escrow fee protection for students and instructors.
-                </p>
+                    <span className="inline-block rounded-full bg-secondary-container/60 px-4 py-1 text-[11px] leading-[14px] font-semibold tracking-wider text-secondary uppercase">
+                        Institutional Workflow
+                    </span>
+                    <h2 className="font-display mt-1 mb-1 text-[2rem] leading-10 font-bold tracking-tight text-primary-container">
+                        How MentorLagbe Works
+                    </h2>
+                    <p className="text-[15px] leading-6 text-on-surface-variant">
+                        Designed with verified credentials, zero hourly billing, and
+                        monthly escrow fee protection for students and instructors.
+                    </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

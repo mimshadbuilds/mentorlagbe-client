@@ -62,6 +62,9 @@
   --color-outline-variant: var(--outline-variant);
   --color-tertiary: var(--tertiary);
   --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
   --color-error: var(--error);
   --color-on-error: var(--on-error);
 
@@ -140,6 +143,10 @@
   --outline-variant: #c4c6ce;
   --tertiary: #f2b66d;
   --on-tertiary: #263445;
+  /* Material "-fixed" colors — identical in light & dark, so defined once here */
+  --tertiary-fixed: #ffddb8;
+  --tertiary-fixed-dim: #f8bb72;
+  --on-tertiary-fixed-variant: #653e00;
   --error: #ef4444;
   --on-error: #ffffff;
 }

@@ -42,8 +42,7 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
         </div>
 
         <div className="p-5">
-          <div
-            className={cn(
+          <div className={cn(
               "mb-2 flex items-center gap-1.5 text-[11px] leading-[14px] font-medium",
               inPerson ? "text-primary-container" : "text-secondary"
             )}>
@@ -84,6 +83,7 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
             </span>
           </span>
         </div>
+
         <Button
           render={<Link href={detailsHref} />}
           className="h-auto rounded-lg bg-surface-container px-4 py-2 text-[11px] leading-[14px] font-semibold text-primary-container hover:bg-secondary hover:text-on-secondary">

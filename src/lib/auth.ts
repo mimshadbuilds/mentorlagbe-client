@@ -26,7 +26,8 @@ export const auth = betterAuth({
             } 
         }
     },
-        plugins: [
+    
+    plugins: [
         jwt({ sessionCookieCache: true })
     ],
     session: {

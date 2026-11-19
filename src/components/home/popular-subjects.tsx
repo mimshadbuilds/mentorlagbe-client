@@ -1,15 +1,20 @@
 import Image from "next/image";
-import { ChevronRight, Globe, Languages, School, Sigma } from "lucide-react";
+import {
+  ChevronRight,
+  Code2,
+  Languages,
+  Sigma,
+  Waves,
+} from "lucide-react";
 
 
 const categories = [
   {
     icon: Sigma,
-    title: "HSC & College",
-    batches: 64,
+    title: "Mathematics",
     description:
-      "Higher Math, Physics, Chemistry, Biology & ICT for Class 11-12 Board & Admission.",
-    students: "5,200+ Active Students",
+      "Calculus, Linear Algebra, Pure Math P1-P4, Mechanics & O/A Levels.",
+    students: "3,450+ Students Enrolled",
     avatars: [
       { src: "/subjects/avatar-1.jpg", alt: "Tutor avatar BUET" },
       { src: "/subjects/avatar-2.jpg", alt: "Tutor avatar DU" },
@@ -17,12 +22,11 @@ const categories = [
     ],
   },
   {
-    icon: Globe,
-    title: "O / A-Levels",
-    batches: 48,
+    icon: Waves,
+    title: "Physics",
     description:
-      "Edexcel & CAIE Pure Math P1-P4, Mechanics, Physics, Accounting & Economics.",
-    students: "3,100+ Active Students",
+      "Newtonian Mechanics, Wave Optics, Modern Physics & Engineering Admission.",
+    students: "2,890+ Students Enrolled",
     avatars: [
       { src: "/subjects/avatar-4.jpg", alt: "O Level tutor" },
       { src: "/subjects/avatar-5.jpg", alt: "A Level tutor female" },
@@ -30,12 +34,11 @@ const categories = [
     ],
   },
   {
-    icon: School,
-    title: "SSC & Class 9-10",
-    batches: 52,
+    icon: Code2,
+    title: "Programming",
     description:
-      "General Science, Higher Math, General Math, Physics & Board CQ drills.",
-    students: "4,120+ Active Students",
+      "Python, JavaScript, Data Structures & Algorithms, React, and Backend API Dev.",
+    students: "4,120+ Students Enrolled",
     avatars: [
       { src: "/subjects/avatar-7.jpg", alt: "SSC tutor male" },
       { src: "/subjects/avatar-8.jpg", alt: "Class 10 mentor" },
@@ -44,11 +47,10 @@ const categories = [
   },
   {
     icon: Languages,
-    title: "IELTS & Skills",
-    batches: 39,
+    title: "IELTS & English",
     description:
-      "Academic Writing Task 1-2, Spoken English, Pronunciation & Web Development.",
-    students: "3,980+ Active Students",
+      "Academic Writing Task 1 & 2, Spoken English, Pronunciation & Reading Speed.",
+    students: "3,980+ Students Enrolled",
     avatars: [
       { src: "/subjects/avatar-10.jpg", alt: "IELTS trainer" },
       { src: "/subjects/avatar-11.jpg", alt: "Language coach" },
@@ -66,13 +68,13 @@ export default function PopularSubjects() {
             <span className="text-[11px] leading-[14px] font-semibold tracking-wider text-secondary uppercase">
               Curated Disciplines
             </span>
-            <h2 className="font-display mt-1 text-[2rem] leading-10 font-bold tracking-tight text-primary-container">
-              Explore Disciplines & Academic Levels
+            <h2 className="font-display mt-1 text-2xl leading-8 font-bold tracking-tight text-primary-container sm:text-[2rem] sm:leading-10">
+              Explore Popular Subjects
             </h2>
           </div>
-          <p className="max-w-md text-[15px] leading-6 text-on-surface-variant">
-            Browse verified batches tailored to standard school, college, and
-            international examination boards.
+          <p className="max-w-md text-xs leading-4 text-on-surface-variant sm:text-[15px] sm:leading-6">
+            Our highest-demand academic tracks taught by subject Olympiad
+            winners and industry practitioners.
           </p>
         </div>
 
@@ -82,24 +84,21 @@ export default function PopularSubjects() {
             return (
               <div
                 key={category.title}
-                className="group flex flex-col justify-between rounded-xl border border-surface-container/60 bg-surface-container-lowest p-6 shadow-sm transition-all duration-200 hover:shadow-md">
+                className="group flex flex-col justify-between rounded-xl border border-surface-container/60 bg-surface-container-lowest p-4 shadow-sm transition-all duration-200 hover:shadow-md sm:p-6">
                 <div>
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container text-primary-container transition-colors group-hover:bg-secondary group-hover:text-on-secondary">
-                    <Icon className="size-7" />
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 transition-colors group-hover:bg-secondary">
+                    <Icon className="size-5 text-primary-container dark:text-on-primary-container group-hover:text-on-secondary" />
                   </div>
 
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <h3 className="font-display text-xl font-bold text-primary-container">
+                  <div className="mb-1">
+                    <h3 className="font-display text-base font-bold text-primary-container sm:text-lg">
                       {category.title}
                     </h3>
-                    <span className="rounded bg-surface-container px-2 py-0.5 text-[11px] leading-[14px] font-semibold text-primary-container">
-                      {category.batches} Batches
-                    </span>
                   </div>
-                  <p className="mb-4 text-[13px] leading-5 text-on-surface-variant">
+                  <p className="mb-3 text-[11px] leading-4 text-on-surface-variant sm:text-xs sm:leading-5">
                     {category.description}
                   </p>
-                  <div className="mb-4 text-[11px] leading-[14px] font-semibold text-secondary">
+                  <div className="mb-4 text-[10px] leading-[14px] font-semibold text-secondary sm:text-[11px]">
                     {category.students}
                   </div>
                 </div>

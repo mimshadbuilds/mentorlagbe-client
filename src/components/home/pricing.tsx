@@ -19,7 +19,7 @@ const proFeatures = [
 
 const PricingCards = () => {
     return (
-        <section className="w-full bg-surface-container-low py-8">
+        <section className="w-full bg-surface-container-low py-15">
             <div className="mx-auto max-w-5xl px-4 md:px-6 lg:px-8">
                 <div className="mx-auto mb-12 max-w-2xl text-center">
                     <span className="mb-2 block text-[11px] leading-[14px] font-bold tracking-wider text-secondary uppercase">

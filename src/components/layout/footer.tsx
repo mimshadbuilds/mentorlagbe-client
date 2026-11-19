@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { GraduationCap, Mail, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 import {
   FacebookIcon,
@@ -80,9 +81,13 @@ export default function SiteFooter() {
           {/* Brand */}
           <div className="flex flex-col pr-space-md lg:col-span-2">
             <div className="mb-space-md flex items-center gap-space-sm">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <GraduationCap className="size-5" />
-              </span>
+              <Image
+                src="/mentorlagbe-icon.png"
+                alt=""
+                width={44}
+                height={44}
+                className="size-11 object-contain"
+              />
               <span className="font-display text-xl font-bold tracking-tight text-primary-container">
                 MentorLagbe
               </span>

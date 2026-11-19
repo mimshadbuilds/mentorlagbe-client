@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import {
-  GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -77,9 +77,14 @@ export default function SiteHeader() {
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-2.5">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <GraduationCap className="size-5" />
-            </span>
+            <Image
+              src="/mentorlagbe-icon.png"
+              alt=""
+              width={40}
+              height={40}
+              className="size-9 object-contain"
+              priority
+            />
             <span className="font-display text-xl font-bold tracking-tight text-primary-container">
               MentorLagbe
             </span>
@@ -140,16 +145,19 @@ export default function SiteHeader() {
                   className="lg:hidden"
                   aria-label="Open menu"
                 />
-              }
-            >
+              }>
               <Menu />
             </SheetTrigger>
             <SheetContent side="right" className="gap-0 p-0">
               <SheetHeader className="border-b border-border">
                 <SheetTitle className="flex items-center gap-2 text-base">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <GraduationCap className="size-4" />
-                  </span>
+                  <Image
+                    src="/mentorlagbe-icon.png"
+                    alt=""
+                    width={36}
+                    height={36}
+                    className="size-8 object-contain"
+                  />
                   <span className="font-display font-bold text-primary-container">
                     MentorLagbe
                   </span>

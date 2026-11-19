@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner"
-
+import { Toaster } from "@/components/ui/sonner";
+import SiteHeader from "@/components/layout/header";
+import SiteFooter from "@/components/layout/footer";
 
 const fontmanrope = Manrope({
     subsets: ["latin"],
@@ -26,12 +28,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${fontmanrope.variable} ${fontinter.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        <main>
-          {children}
-        </main>
-        <Toaster />
+      <body className="flex min-h-full flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <Toaster />
+        </ThemeProvider>
         </body>
     </html>
   );

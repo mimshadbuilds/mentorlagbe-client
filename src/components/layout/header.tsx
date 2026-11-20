@@ -89,9 +89,13 @@ export default function SiteHeader() {
               MentorLagbe
             </span>
           </Link>
-          {user && role && (
+          {user && role ? (
             <span className="hidden sm:block">
               <RoleBadge role={role} />
+            </span>
+          ) : (
+            <span className="hidden rounded-full bg-secondary-container px-2 py-0.5 text-[10px] font-semibold text-on-secondary-container sm:block">
+              EdTech
             </span>
           )}
         </div>
@@ -175,8 +179,7 @@ export default function SiteHeader() {
                       isActive(link.href)
                         ? "bg-secondary-container text-secondary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}
-                  >
+                    )}>
                     {link.label}
                   </Link>
                 ))}

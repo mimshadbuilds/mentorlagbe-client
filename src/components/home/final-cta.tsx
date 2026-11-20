@@ -15,7 +15,6 @@ export default function FinalCta() {
           <h2 className="font-display mb-4 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
             Find the right tuition or share your subject expertise.
           </h2>
-
           <p className="mb-8 text-sm leading-relaxed text-slate-300 sm:text-base">
             Whether you are preparing for critical board examinations or
             looking to start your next tuition batch, MentorLagbe provides a
@@ -25,15 +24,13 @@ export default function FinalCta() {
           <div className="flex flex-wrap items-center gap-4">
             <Button
               render={<Link href="/tuitions" />}
-              className="h-auto rounded-lg bg-[#0e7464] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#0b5c4f]"
-            >
+              className="h-auto rounded-lg bg-[#0e7464] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#0b5c4f]">
               Find Tuitions Now
             </Button>
             <Button
               render={<Link href="/sign-up" />}
               variant="outline"
-              className="h-auto rounded-lg border-slate-600/40 bg-[#24364c] px-6 py-3 text-sm font-semibold text-slate-100 shadow-sm hover:bg-[#2e435e] hover:text-slate-100 dark:border-slate-600/40 dark:bg-[#24364c] dark:hover:bg-[#2e435e]"
-            >
+              className="h-auto rounded-lg border-slate-600/40 bg-[#24364c] px-6 py-3 text-sm font-semibold text-slate-100 shadow-sm hover:bg-[#2e435e] hover:text-slate-100 dark:border-slate-600/40 dark:bg-[#24364c] dark:hover:bg-[#2e435e]">
               Register as Tutor
             </Button>
           </div>

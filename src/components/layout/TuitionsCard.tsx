@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Video } from "lucide-react";
+import { BadgeCheck, MapPin, School, Video } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 
@@ -14,9 +14,22 @@ export interface ITuition  {
   monthlyFee: number;
   tutorName: string;
   image: string;
+  /** Browse-page extras — the homepage passes none of these. */
+  verifiedSeal?: string;
+  modeDetail?: string;
+  tutorAffiliation?: string;
 };
 
-export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
+interface TuitionsCardProps {
+  tuition: ITuition;
+  /**
+   * How the online-mode row begins: "camera" renders the Video icon
+   * (homepage), "dot" renders the teal dot from the browse design.
+   */
+  onlineIndicator?: "camera" | "dot";
+};
+
+export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: TuitionsCardProps) {
   const detailsHref = tuition.id ? `/tuitions/${tuition.id}` : "#";
   const inPerson = tuition.mode === "in-person";
 
@@ -39,6 +52,12 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
               {tuition.classLevel}
             </span>
           </div>
+          {tuition.verifiedSeal && (
+            <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] leading-[14px] font-semibold text-on-secondary shadow-sm">
+              <BadgeCheck className="size-3.5" aria-hidden="true" />
+              {tuition.verifiedSeal}
+            </span>
+          )}
         </div>
 
         <div className="p-5">
@@ -48,13 +67,15 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
             )}>
             {inPerson ? (
               <MapPin className="size-4 text-secondary" />
+            ) : onlineIndicator === "dot" ? (
+              <span className="size-2 shrink-0 rounded-full bg-secondary" />
             ) : (
               <Video className="size-4" />
             )}
             <span>
               {inPerson
-                ? `In-Person — ${tuition.location}`
-                : "Online Live Batch"}
+                ? `In-Person • ${tuition.location}`
+                : `Online Live Batch${tuition.modeDetail ? ` • ${tuition.modeDetail}` : ""}`}
             </span>
           </div>
 
@@ -62,10 +83,16 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
             {tuition.title}
           </h3>
 
-          <p className="mb-4 text-[11px] leading-[14px] font-medium text-on-surface-variant">
-            Instructor:{" "}
-            <span className="font-semibold text-primary-container">
-              {tuition.tutorName}
+          <p className="mb-4 flex items-center gap-2 text-[11px] leading-[14px] font-medium text-on-surface-variant">
+            {tuition.tutorAffiliation && (
+              <School className="size-4 shrink-0" aria-hidden="true" />
+            )}
+            <span>
+              Instructor:{" "}
+              <span className="font-semibold text-primary-container">
+                {tuition.tutorName}
+              </span>
+              {tuition.tutorAffiliation && <> ({tuition.tutorAffiliation})</>}
             </span>
           </p>
         </div>
@@ -86,7 +113,7 @@ export default function TuitionsCard({ tuition }: { tuition: ITuition }) {
 
         <Button
           render={<Link href={detailsHref} />}
-          className="h-auto rounded-lg bg-surface-container px-4 py-2 text-[11px] leading-[14px] font-semibold text-primary-container hover:bg-secondary hover:text-on-secondary">
+          className="h-auto rounded-lg bg-secondary px-4 py-2 text-[11px] leading-[14px] font-semibold text-on-secondary shadow-sm hover:bg-[#156057]">
           View Details
         </Button>
       </div>

@@ -23,7 +23,17 @@ export const auth = betterAuth({
                 type: ["student", "tutor", "admin"],
                 input: true,
                 defaultValue: 'student'
-            } 
+            },
+            phone: {
+                type: "string",
+                input: true,
+                defaultValue: ""
+            },
+            bio: {
+                type: "string",
+                input: true,
+                defaultValue: ""
+            }
         }
     },
 

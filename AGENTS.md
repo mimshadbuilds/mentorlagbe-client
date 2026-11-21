@@ -64,6 +64,7 @@ src/lib/data/              seed datasets (tuitions, applications, tutor) + types
 | Browse `/tuitions`, details `/tuitions/[id]` | **API** (`tuition-query.ts` → GET /tuitions, /tuitions/:id), raw backend `ITuition` shape (no mapper) |
 | Tutor post submission | **API** (`createTuition` in `actions/tution.ts`) |
 | Admin overview, users, moderation, transactions | **API** (`admin-query.ts` reads, `admin.ts` writes) — backend endpoints listed under Completed phases |
+| Profile `/dashboard/profile` | **Better Auth** (`authClient.updateUser`); `phone`/`bio` are user `additionalFields` in `auth.ts` — no backend endpoint needed |
 | Student dashboard applications, tutor dashboard (posts/applicants), saved tuitions | Seed/client-side (`lib/data/*`, localStorage store) — `TODO(backend)` markers mark every swap point |
 | Homepage featured tuitions | Local component data |
 
@@ -94,10 +95,15 @@ token from `authHeader()` 401s against backend `verifyToken`.
   transactions table. Server reads (`admin-query.ts`), client writes
   (`admin.ts` → toast + `router.refresh()`). Design extras parked in
   `dashboard-design-notes.md` items 25–30.
-- **Next:** profile page (docx 112). Backend still owes: `GET /admin/stats`,
+- **Phase 12** Profile page (docx 112) — shared editor for all roles: name, phone,
+  bio, picture URL + live avatar preview; persists via `authClient.updateUser`.
+  Added `phone`/`bio` as user `additionalFields` in `auth.ts` (no backend endpoint
+  needed). `TODO(backend)` for direct ImgBB upload (no API key in `.env`); design
+  extras parked as notes items 31–35.
+- **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
+  (Challenge 3). From Phase 11 the backend still owes: `GET /admin/stats`,
   `GET /admin/users`, `PATCH /admin/users/:id/role`, extended
-  `GET /admin/tuitions` (all posts, not just pending),
-  `PATCH /admin/tuitions/:id/approval`, `GET /admin/transactions`.
+  `GET /admin/tuitions`, `PATCH /admin/tuitions/:id/approval`, `GET /admin/transactions`.
 
 ## Verification ritual (run before reporting any phase done)
 

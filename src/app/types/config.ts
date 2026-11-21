@@ -13,14 +13,14 @@ import {
 } from "lucide-react";
 import type { UserRole } from "@/components/layout/AuthUser";
 
-export interface DashboardUser {
+export interface IDashboardUser {
   name: string;
   email: string;
   image: string | null;
   role: UserRole;
 }
 
-export interface DashboardNavItem {
+export interface IDashboardNavItem {
   label: string;
   href: string;
   icon: LucideIcon;
@@ -32,7 +32,7 @@ export const roleLabel: Record<UserRole, string> = {
   admin: "Admin",
 };
 
-export const dashboardNav: Record<UserRole, DashboardNavItem[]> = {
+export const dashboardNav: Record<UserRole, IDashboardNavItem[]> = {
   student: [
     { label: "Overview", href: "/dashboard/student", icon: LayoutGrid },
     { label: "My Applications", href: "/dashboard/student/my-applications", icon: Send },
@@ -52,7 +52,7 @@ export const dashboardNav: Record<UserRole, DashboardNavItem[]> = {
   ],
 };
 
-export const profileNavItem: DashboardNavItem = {
+export const profileNavItem: IDashboardNavItem = {
   label: "Update Profile",
   href: "/dashboard/profile",
   icon: UserRound,

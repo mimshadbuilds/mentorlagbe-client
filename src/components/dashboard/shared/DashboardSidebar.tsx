@@ -29,15 +29,9 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  dashboardNav,
-  isActivePath,
-  profileNavItem,
-  roleLabel,
-  type DashboardUser,
-} from "../../../app/types/config";
+import { dashboardNav,isActivePath, profileNavItem, roleLabel, type IDashboardUser } from "../../../app/types/config";
 
-export default function DashboardSidebar({ user }: { user: DashboardUser }) {
+export default function DashboardSidebar({ user }: { user: IDashboardUser }) {
   const pathname = usePathname();
   const router = useRouter();
   const { isMobile, setOpenMobile } = useSidebar();

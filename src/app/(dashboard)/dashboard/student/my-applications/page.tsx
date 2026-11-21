@@ -1,10 +1,5 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import ApplicationsTable from "@/components/dashboard/student/applications-table";
 
 export default function MyApplicationsPage() {
-  return (
-    <DashboardStub
-      title="My Applications"
-      description="All tuitions you applied for — tutor details, monthly fee, applied date, and a status badge. Pending applications can be cancelled."
-    />
-  );
+  return <ApplicationsTable />;
 }

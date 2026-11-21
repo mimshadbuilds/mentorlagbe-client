@@ -1,10 +1,5 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import StudentOverview from "@/components/dashboard/student/student-overview";
 
 export default function StudentOverviewPage() {
-  return (
-    <DashboardStub
-      title="Student Overview"
-      description="Dashboard stat cards — Total Applied Tuitions, Accepted Applications, Pending Applications, and Current Plan (Free/Pro)."
-    />
-  );
+  return <StudentOverview />;
 }

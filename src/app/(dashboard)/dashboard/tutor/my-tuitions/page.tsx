@@ -1,10 +1,6 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import MyTuitions from "@/components/dashboard/tutor/my-tuitions";
 
+/** docx line 104: CRUD + Active/Closed toggle for the tutor's tuitions. */
 export default function MyTuitionsPage() {
-  return (
-    <DashboardStub
-      title="My Tuitions"
-      description="Full CRUD for your tuition posts — admin approval status, edit/delete, and Active/Closed toggle."
-    />
-  );
+  return <MyTuitions />;
 }

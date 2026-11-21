@@ -1,10 +1,5 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import TutorOverview from "@/components/dashboard/tutor/tutor-overview";
 
-export default function TutorOverviewPage() {
-  return (
-    <DashboardStub
-      title="Tutor Overview"
-      description="Dashboard stat cards — Total Tuitions Posted, Active/Approved Tuitions, Total Applicants Received, and Current Plan (Free/Pro)."
-    />
-  );
+export default function TutorDashboardPage() {
+  return <TutorOverview />;
 }

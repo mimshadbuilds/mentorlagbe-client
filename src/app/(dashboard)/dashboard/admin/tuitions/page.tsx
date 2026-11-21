@@ -1,10 +1,7 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import ModerationList from "@/components/dashboard/admin/moderation-list";
+import { getAdminTuitions } from "@/lib/actions/admin-query";
 
-export default function AdminTuitionsPage() {
-  return (
-    <DashboardStub
-      title="Tuition Moderation"
-      description="All tuition posts submitted by tutors — approve or reject each listing."
-    />
-  );
+export default async function AdminTuitionsPage() {
+  const tuitions = await getAdminTuitions();
+  return <ModerationList tuitions={tuitions} />;
 }

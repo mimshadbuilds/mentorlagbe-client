@@ -1,10 +1,7 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import AdminOverview from "@/components/dashboard/admin/admin-overview";
+import { getAdminStats } from "@/lib/actions/admin-query";
 
-export default function AdminOverviewPage() {
-  return (
-    <DashboardStub
-      title="Admin Overview"
-      description="Platform statistics — Total Users, Total Tutors, Pending vs. Approved Tuitions, and Total Stripe Revenue."
-    />
-  );
+export default async function AdminOverviewPage() {
+  const stats = await getAdminStats();
+    return <AdminOverview stats={stats} />;
 }

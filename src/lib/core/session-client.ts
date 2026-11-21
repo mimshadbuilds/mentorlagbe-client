@@ -1,0 +1,9 @@
+"use client";
+
+import { authClient } from "../auth-client";
+
+export const getClientToken = async () => {
+    const { data } = await authClient.token();
+
+    return data?.token;
+}

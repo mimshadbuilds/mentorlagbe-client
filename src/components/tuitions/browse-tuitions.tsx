@@ -11,7 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import TuitionsCard from "@/components/layout/TuitionsCard";
-import { approvedTuitions } from "@/lib/data/tuitions";
+import type { ITuition } from "@/lib/actions/tuition-query";
 import { cn } from "cn";
 import Link from "next/link";
 
@@ -46,10 +46,11 @@ const classOptions = [
   { value: "Admission Prep", label: "University Admission" },
 ];
 
+// Values mirror the backend mode enum (Online / Offline); labels are UI copy.
 const modeOptions = [
   { value: "", label: "All Modes" },
   { value: "Online", label: "Online Live Batch" },
-  { value: "In-Person", label: "In-Person / Offline" },
+  { value: "Offline", label: "In-Person / Offline" },
 ];
 
 const locationOptions = [
@@ -108,7 +109,12 @@ function FilterSelect({ id, label, value, options, onChange }: FilterSelectProps
   );
 }
 
-export default function BrowseTuitions() {
+export default function BrowseTuitions({
+  tuitions,
+}: {
+  /** Approved listings fetched server-side from mentorlagbe-server. */
+  tuitions: ITuition[];
+}) {
   const [filters, setFilters] = useState(emptyFilters);
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
@@ -133,7 +139,7 @@ export default function BrowseTuitions() {
   const filteredTuitions = useMemo(() => {
     const query = filters.search.trim().toLowerCase();
 
-    const matches = approvedTuitions.filter((tuition) => {
+    const matches = tuitions.filter((tuition) => {
       if (
         query &&
         !tuition.title.toLowerCase().includes(query) &&
@@ -161,7 +167,7 @@ export default function BrowseTuitions() {
       }
       if (
         filters.location &&
-        !(tuition.location ?? "").toLowerCase().includes(filters.location.toLowerCase())
+        !tuition.location.toLowerCase().includes(filters.location.toLowerCase())
       ) {
         return false;
       }
@@ -174,8 +180,8 @@ export default function BrowseTuitions() {
     if (sort === "fee-desc") {
       return [...matches].sort((a, b) => b.monthlyFee - a.monthlyFee);
     }
-    return [...matches].sort((a, b) => b.postedAt.localeCompare(a.postedAt));
-  }, [filters, sort]);
+    return [...matches].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }, [tuitions, filters, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTuitions.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -323,7 +329,7 @@ export default function BrowseTuitions() {
           <div className="grid grid-cols-1 gap-space-lg md:grid-cols-2 lg:grid-cols-3">
             {pageTuitions.map((tuition) => (
               <TuitionsCard
-                key={tuition.id}
+                key={tuition._id}
                 tuition={tuition}
                 onlineIndicator="dot"
               />
@@ -336,7 +342,7 @@ export default function BrowseTuitions() {
             </p>
             <p className="mt-1 text-sm text-on-surface-variant">
               Try a different keyword, or clear the filters to see all{" "}
-              {approvedTuitions.length} listings.
+              {tuitions.length} listings.
             </p>
             <button
               type="button"

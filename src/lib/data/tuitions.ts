@@ -1,8 +1,6 @@
-import type { ITuition } from "@/components/layout/TuitionsCard";
-
 export type TuitionApprovalStatus = "approved" | "pending" | "rejected";
 
-/** Tutor profile summary shown on the Tuition Details page (docx line 92). */
+/** Tutor profile summary kept with each seed record for a later phase. */
 export interface TutorProfile {
   /** e.g. "Associate Professor of Chemistry" */
   title: string;
@@ -18,10 +16,23 @@ export interface TutorProfile {
 }
 
 /**
- * A seeded tuition listing — the shape mentorlagbe-server will eventually
- * return from its tuitions endpoint.
+ * A seeded tuition listing for the dashboards. Field names are the seed's
+ * own — public pages consume the API's ITuition shape from
+ * lib/actions/tuition-query instead.
  */
-export interface TuitionRecord extends ITuition {
+export interface TuitionRecord {
+  id?: string;
+  title: string;
+  subject: string;
+  classLevel: string;
+  mode: "online" | "in-person";
+  location?: string;
+  monthlyFee: number;
+  tutorName: string;
+  tutorAffiliation?: string;
+  verifiedSeal?: string;
+  modeDetail?: string;
+  image: string;
   approvalStatus: TuitionApprovalStatus;
   isActive: boolean;
   /** ISO date (yyyy-mm-dd) — drives the "Latest Posted" sort. */
@@ -35,10 +46,9 @@ export interface TuitionRecord extends ITuition {
 }
 
 /**
- * Seed dataset for Browse Tuitions (docx: "seed at least 10–12 approved
+ * Seed dataset for the dashboards (docx: "seed at least 10–12 approved
  * tuitions"). Entries 1–9 mirror the stitch design's cards verbatim; 10–12
- * are grounded extras. When mentorlagbe-server ships search & filtering,
- * this module is the only layer that gets swapped for API calls.
+ * are grounded extras. Browse/Details read mentorlagbe-server instead.
  */
 export const tuitionRecords: TuitionRecord[] = [
   {
@@ -390,8 +400,3 @@ export const tuitionRecords: TuitionRecord[] = [
     },
   },
 ];
-
-/** Docx rule: only admin-approved & active listings appear on Browse. */
-export const approvedTuitions: TuitionRecord[] = tuitionRecords.filter(
-  (tuition) => tuition.approvalStatus === "approved" && tuition.isActive,
-);

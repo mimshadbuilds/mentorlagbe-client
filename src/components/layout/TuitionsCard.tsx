@@ -1,44 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, MapPin, School, Video } from "lucide-react";
+import { MapPin, Video } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 
 export interface ITuition  {
-  id?: string;
+  _id?: string;
   title: string;
   subject: string;
   classLevel: string;
-  mode: "online" | "in-person";
+  mode: "Online" | "Offline";
   location?: string;
   monthlyFee: number;
   tutorName: string;
-  image: string;
-  /** Browse-page extras — the homepage passes none of these. */
-  verifiedSeal?: string;
-  modeDetail?: string;
-  tutorAffiliation?: string;
+  bannerImage: string;
 };
 
-interface TuitionsCardProps {
+interface ITuitionsCardProps {
   tuition: ITuition;
-  /**
-   * How the online-mode row begins: "camera" renders the Video icon
-   * (homepage), "dot" renders the teal dot from the browse design.
-   */
   onlineIndicator?: "camera" | "dot";
 };
 
-export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: TuitionsCardProps) {
-  const detailsHref = tuition.id ? `/tuitions/${tuition.id}` : "#";
-  const inPerson = tuition.mode === "in-person";
+export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: ITuitionsCardProps) {
+  const detailsHref = tuition._id ? `/tuitions/${tuition._id}` : "#";
+  const inPerson = tuition.mode === "Offline";
 
   return (
     <article className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all hover:border-secondary/40 hover:shadow-md">
       <div>
         <div className="relative h-48 overflow-hidden bg-surface-container-low">
           <Image
-            src={tuition.image}
+            src={tuition.bannerImage}
             alt={`Instructor ${tuition.tutorName} teaching ${tuition.subject}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -52,12 +44,6 @@ export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: Tu
               {tuition.classLevel}
             </span>
           </div>
-          {tuition.verifiedSeal && (
-            <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] leading-[14px] font-semibold text-on-secondary shadow-sm">
-              <BadgeCheck className="size-3.5" aria-hidden="true" />
-              {tuition.verifiedSeal}
-            </span>
-          )}
         </div>
 
         <div className="p-5">
@@ -75,7 +61,7 @@ export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: Tu
             <span>
               {inPerson
                 ? `In-Person • ${tuition.location}`
-                : `Online Live Batch${tuition.modeDetail ? ` • ${tuition.modeDetail}` : ""}`}
+                : "Online Live Batch"}
             </span>
           </div>
 
@@ -84,15 +70,11 @@ export default function TuitionsCard({ tuition, onlineIndicator = "camera" }: Tu
           </h3>
 
           <p className="mb-4 flex items-center gap-2 text-[11px] leading-[14px] font-medium text-on-surface-variant">
-            {tuition.tutorAffiliation && (
-              <School className="size-4 shrink-0" aria-hidden="true" />
-            )}
             <span>
               Instructor:{" "}
               <span className="font-semibold text-primary-container">
                 {tuition.tutorName}
               </span>
-              {tuition.tutorAffiliation && <> ({tuition.tutorAffiliation})</>}
             </span>
           </p>
         </div>

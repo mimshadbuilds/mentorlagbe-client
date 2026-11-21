@@ -1,8 +1,7 @@
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
-import { authClient } from "../auth-client";
 
-export const getUserSession = async() =>{
+export const getUserSession = async () => {
     const session = await auth.api.getSession({
         headers: await headers()
     })
@@ -16,13 +15,6 @@ export const getUserToken = async () => {
     })
 
     return session?.session?.token || null;
-}
-
-export const getClientToken = async () => {
-    const { data } = await authClient.token()
-    const token = data?.token;
-
-    return token;
 }
 
 export const getServerToken = async () => {

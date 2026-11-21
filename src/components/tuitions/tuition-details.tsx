@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
-import type { TuitionRecord } from "@/lib/data/tuitions";
+import type { ITuition } from "@/lib/actions/tuition-query";
 import ApplyTuitionDialog from "./apply-tuition-dialog";
 
 function DetailField({
@@ -45,15 +45,29 @@ function DetailField({
   );
 }
 
-export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) {
+export default function TuitionDetails({ tuition }: { tuition: ITuition }) {
   const [saved, setSaved] = useState(false);
 
-  const inPerson = tuition.mode === "in-person";
+  const inPerson = tuition.mode === "Offline";
   const initial = tuition.tutorName.replace(/^(Dr\.|Engr\.|Md\.)\s*/, "").charAt(0);
-  const postedOn = new Date(`${tuition.postedAt}T00:00:00`).toLocaleDateString(
-    "en-US",
-    { month: "short", day: "numeric", year: "numeric" }
-  );
+  const postedOn = new Date(tuition.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  // TODO(backend): tutor profile summary (docx line 92). The API doesn't
+  // store it yet, so the designed card renders neutral placeholders until
+  // mentorlagbe-server provides real values.
+  const tutorProfile = {
+    title: `${tuition.subject} Tutor`,
+    institution: "MentorLagbe",
+    rating: "0.0",
+    reviewCount: 0,
+    experience: "—",
+    mentored: "—",
+    bio: `${tuition.tutorName} is a verified ${tuition.subject} tutor for ${tuition.classLevel} on MentorLagbe.`,
+  };
 
   const handleShare = async () => {
     try {
@@ -86,7 +100,7 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
         <div className="flex flex-col gap-6 lg:col-span-8">
           <div className="relative h-[360px] w-full overflow-hidden rounded-2xl bg-surface-container shadow-sm sm:h-[420px]">
             <Image
-              src={tuition.image}
+              src={tuition.bannerImage}
               alt={`${tuition.subject} tuition session`}
               fill
               sizes="(max-width: 1024px) 100vw, 66vw"
@@ -108,16 +122,14 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
                 type="button"
                 aria-label="Share"
                 onClick={handleShare}
-                className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-all hover:bg-white"
-              >
+                className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-all hover:bg-white">
                 <Share2 className="size-[18px]" aria-hidden="true" />
               </button>
               <button
                 type="button"
                 aria-label="Save Bookmark"
                 onClick={handleSave}
-                className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-all hover:bg-white"
-              >
+                className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-all hover:bg-white">
                 <Bookmark
                   className={cn("size-[18px]", saved && "fill-current")}
                   aria-hidden="true"
@@ -159,7 +171,7 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
                 <span>
                   Schedule:{" "}
                   <strong className="font-medium text-on-surface">
-                    {tuition.daysPerWeek}
+                    {tuition.daysPerWeek} days / week
                   </strong>
                 </span>
               </div>
@@ -238,11 +250,11 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
                 value={inPerson ? "In-Person" : "Online"}
                 accent
               />
+              <DetailField label="Location" value={tuition.location || "Online"} />
               <DetailField
-                label="Location"
-                value={tuition.location ?? "Online"}
+                label="Weekly Classes"
+                value={`${tuition.daysPerWeek} days / week`}
               />
-              <DetailField label="Weekly Classes" value={tuition.daysPerWeek} />
               <div className="flex items-center justify-between py-3">
                 <span className="text-on-surface-variant">Status</span>
                 <span className="rounded-full bg-secondary-container px-2.5 py-0.5 text-xs font-semibold text-secondary">
@@ -297,29 +309,29 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
                   {tuition.tutorName}
                 </h3>
                 <p className="text-xs leading-snug font-medium text-on-surface">
-                  {tuition.tutorProfile.title}
+                  {tutorProfile.title}
                 </p>
                 <p className="mt-0.5 truncate text-xs text-on-surface-variant">
-                  {tuition.tutorProfile.institution}
+                  {tutorProfile.institution}
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 rounded-xl border border-surface-container bg-surface-container-low px-3 py-3 text-center">
               <div className="flex flex-col">
                 <div className="flex items-center justify-center gap-0.5 text-xs font-bold text-primary-container">
-                  <span>{tuition.tutorProfile.rating}</span>
+                  <span>{tutorProfile.rating}</span>
                   <Star
                     className="size-[13px] fill-tertiary text-tertiary"
                     aria-hidden="true"
                   />
                 </div>
                 <span className="text-[11px] text-on-surface-variant">
-                  {tuition.tutorProfile.reviewCount} Reviews
+                  {tutorProfile.reviewCount} Reviews
                 </span>
               </div>
               <div className="flex flex-col border-x border-surface-container">
                 <span className="text-xs font-bold text-primary-container">
-                  {tuition.tutorProfile.experience}
+                  {tutorProfile.experience}
                 </span>
                 <span className="text-[11px] text-on-surface-variant">
                   Experience
@@ -327,7 +339,7 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-primary-container">
-                  {tuition.tutorProfile.mentored}
+                  {tutorProfile.mentored}
                 </span>
                 <span className="text-[11px] text-on-surface-variant">
                   Mentored
@@ -335,7 +347,7 @@ export default function TuitionDetails({ tuition }: { tuition: TuitionRecord }) 
               </div>
             </div>
             <p className="text-xs leading-relaxed text-on-surface-variant">
-              {tuition.tutorProfile.bio}
+              {tutorProfile.bio}
             </p>
             <Link
               href="#"

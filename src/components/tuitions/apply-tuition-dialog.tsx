@@ -6,7 +6,7 @@ import { ChevronDown, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
 import type { UserRole } from "@/components/layout/AuthUser";
-import type { TuitionRecord } from "@/lib/data/tuitions";
+import type { ITuition } from "@/lib/actions/tuition-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,7 +30,7 @@ const scheduleOptions = [
 const applyButtonClasses =
   "h-auto w-full rounded-xl px-4 py-3 font-semibold shadow-sm hover:bg-[#156057]";
 
-export default function ApplyTuitionDialog({ tuition }: { tuition: TuitionRecord }) {
+export default function ApplyTuitionDialog({ tuition }: { tuition: ITuition }) {
   const { data: session } = useSession();
   const user = session?.user ?? null;
   const role = user ? (user.role as UserRole) : null;

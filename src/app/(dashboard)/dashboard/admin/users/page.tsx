@@ -1,10 +1,7 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import UsersTable from "@/components/dashboard/admin/users-table";
+import { getAdminUsers } from "@/lib/actions/admin-query";
 
-export default function UserManagementPage() {
-  return (
-    <DashboardStub
-      title="User Management"
-      description="All registered users with role management (student, tutor, admin)."
-    />
-  );
+export default async function UserManagementPage() {
+  const users = await getAdminUsers();
+    return <UsersTable users={users} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,11 +10,18 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSession } from "@/lib/auth-client";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { startCheckout, type ProRole } from "@/lib/actions/payment";
+import { getCurrentProfile, startCheckout } from "@/lib/actions/payment";
+import type {
+  ICurrentProfile,
+  TProPlan,
+  TUserRole,
+} from "@/lib/types/payment";
 
 const plans: {
-  role: ProRole;
+  planId: TProPlan;
+  role: "tutor" | "student";
   audience: string;
   description: string;
   price: string;
@@ -22,6 +29,7 @@ const plans: {
   proFeatures: string[];
 }[] = [
   {
+    planId: "tutor_pro",
     role: "tutor",
     audience: "Tutor Plans",
     description: "Post tuition batches and manage your applicants.",
@@ -40,6 +48,7 @@ const plans: {
     ],
   },
   {
+    planId: "student_pro",
     role: "student",
     audience: "Student Plans",
     description: "Find the right mentor and book with confidence.",
@@ -60,14 +69,47 @@ const plans: {
 ];
 
 export default function PricingPlans() {
-  const [busyRole, setBusyRole] = useState<ProRole | null>(null);
+  const { data: session, isPending } = useSession();
+  const [profile, setProfile] = useState<ICurrentProfile | null>(null);
+  const [checkingPlan, setCheckingPlan] = useState(true);
+  const [busyPlan, setBusyPlan] = useState<TProPlan | null>(null);
+  const userId = session?.user?.id;
+  const role = session?.user?.role as TUserRole | undefined;
 
-  const handleCheckout = async (role: ProRole) => {
-    if (busyRole) return;
-    setBusyRole(role);
+  useEffect(() => {
+    if (isPending) return;
+
+    if (!userId) {
+      setProfile(null);
+      setCheckingPlan(false);
+      return;
+    }
+
+    let active = true;
+    setCheckingPlan(true);
+
+    getCurrentProfile()
+      .then((data) => {
+        if (active) setProfile(data);
+      })
+      .catch(() => {
+        if (active) setProfile(null);
+      })
+      .finally(() => {
+        if (active) setCheckingPlan(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [userId, isPending]);
+
+  const handleCheckout = async (planId: TProPlan) => {
+    if (busyPlan) return;
+    setBusyPlan(planId);
 
     try {
-      await startCheckout(role);
+      await startCheckout(planId);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -75,8 +117,70 @@ export default function PricingPlans() {
           : "Could not start Stripe checkout."
       );
     } finally {
-      setBusyRole(null);
+      setBusyPlan(null);
     }
+  };
+
+  const proCta = (plan: (typeof plans)[number]) => {
+    if (checkingPlan) {
+      return (
+        <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
+          Checking your plan...
+        </Button>
+      );
+    }
+
+    if (!userId) {
+      return (
+        <Link
+          href="/sign-in?redirectTo=/pricing"
+          className={buttonVariants({
+            variant: "secondary",
+            className: "mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold",
+          })}
+        >
+          Sign In to Upgrade
+          <ArrowRight className="size-4" aria-hidden="true" />
+        </Link>
+      );
+    }
+
+    if (role === "admin") {
+      return (
+        <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
+          Not Available for Admins
+        </Button>
+      );
+    }
+
+    if (role !== plan.role) {
+      return (
+        <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
+          Available to {plan.role}s only
+        </Button>
+      );
+    }
+
+    if (profile?.plan === "pro") {
+      return (
+        <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
+          Current Plan: Pro
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        type="button"
+        variant="secondary"
+        disabled={busyPlan !== null}
+        onClick={() => handleCheckout(plan.planId)}
+        className="mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold"
+      >
+        {busyPlan === plan.planId ? "Opening Stripe..." : "Subscribe with Stripe"}
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </Button>
+    );
   };
 
   return (
@@ -98,7 +202,7 @@ export default function PricingPlans() {
       <div className="grid gap-8 lg:grid-cols-2">
         {plans.map((plan) => (
           <section
-            key={plan.role}
+            key={plan.planId}
             className="flex flex-col gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm"
           >
             <div className="flex items-start gap-space-sm">
@@ -149,7 +253,7 @@ export default function PricingPlans() {
                   </ul>
                 </div>
                 <Link
-                  href="/sign-up"
+                  href={userId ? "/dashboard" : "/sign-up"}
                   className={buttonVariants({
                     variant: "outline",
                     className: "mt-6 w-full rounded-xl py-3 text-xs font-bold",
@@ -191,16 +295,7 @@ export default function PricingPlans() {
                     ))}
                   </ul>
                 </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={busyRole !== null}
-                  onClick={() => handleCheckout(plan.role)}
-                  className="mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold"
-                >
-                  Subscribe with Stripe
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Button>
+                {proCta(plan)}
               </div>
             </div>
           </section>

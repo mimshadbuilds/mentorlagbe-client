@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CalendarDays,
   Check,
@@ -16,16 +17,11 @@ import { toast } from "sonner";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { setApplicationStatus } from "@/lib/actions/application";
 import { formatAppliedDate } from "@/lib/data/applications";
-import {
-  getApplicantStats,
-  tutorApplicants,
-  type ApplicantStatus,
-  type TutorApplicant,
-} from "@/lib/data/tutor";
-import { tuitionRecords } from "@/lib/data/tuitions";
+import type { IApplication, TApplicationStatus } from "@/lib/types/application";
 
-type StatusFilter = "all" | ApplicantStatus;
+type StatusFilter = "all" | TApplicationStatus;
 
 const tabs: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "All" },
@@ -39,7 +35,7 @@ function initials(name: string) {
   return `${words[0]?.[0] ?? ""}${words[1]?.[0] ?? ""}`.toUpperCase();
 }
 
-function StatusPill({ status }: { status: ApplicantStatus }) {
+function StatusPill({ status }: { status: TApplicationStatus }) {
   return (
     <Badge
       className={cn(
@@ -61,43 +57,54 @@ function StatusPill({ status }: { status: ApplicantStatus }) {
   );
 }
 
-export default function Applicants() {
-  const [applicants, setApplicants] = useState<TutorApplicant[]>(tutorApplicants);
+export default function Applicants({ applicants }: { applicants: IApplication[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
-  const stats = getApplicantStats(applicants);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const stats = {
+    total: applicants.length,
+    pending: applicants.filter((item) => item.status === "pending").length,
+    accepted: applicants.filter((item) => item.status === "accepted").length,
+    rejected: applicants.filter((item) => item.status === "rejected").length,
+  };
 
   const visible = useMemo(
     () =>
-      applicants.filter((applicant) => {
-        const tuition = tuitionRecords.find((item) => item.id === applicant.tuitionId);
-        return (
-          (filter === "all" || applicant.status === filter) &&
-          (query.trim() === "" ||
-            `${applicant.name} ${applicant.email} ${tuition?.title ?? ""}`
-              .toLowerCase()
-              .includes(query.trim().toLowerCase()))
-        );
-      }),
+      applicants.filter((applicant) =>
+        (filter === "all" || applicant.status === filter) &&
+        (query.trim() === "" ||
+          `${applicant.studentName} ${applicant.studentEmail} ${applicant.tuitionTitle}`
+            .toLowerCase()
+            .includes(query.trim().toLowerCase()))
+      ),
     [applicants, filter, query]
   );
 
-  const decide = (id: string, status: "accepted" | "rejected") => {
-    // TODO(backend): PATCH mentorlagbe-server /applications/:id
-    setApplicants((prev) =>
-      prev.map((applicant) =>
-        applicant.id === id ? { ...applicant, status } : applicant
-      )
-    );
-    toast.success(
-      status === "accepted" ? "Application accepted" : "Application rejected",
-      {
-        description:
-          status === "accepted"
-            ? "The student can now see your contact details."
-            : "The student has been notified of the decision.",
-      }
-    );
+  const decide = async (id: string, status: "accepted" | "rejected") => {
+    if (busyId) return;
+    setBusyId(id);
+
+    try {
+      await setApplicationStatus(id, status);
+      toast.success(
+        status === "accepted" ? "Application accepted" : "Application rejected",
+        {
+          description:
+            status === "accepted"
+              ? "The student can now see your contact details."
+              : "The student has been notified of the decision.",
+        }
+      );
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update the application."
+      );
+    } finally {
+      setBusyId(null);
+    }
   };
 
   return (
@@ -190,121 +197,113 @@ export default function Applicants() {
             No applicants match this filter.
           </div>
         ) : (
-          visible.map((applicant) => {
-            const tuition = tuitionRecords.find(
-              (item) => item.id === applicant.tuitionId
-            );
-
-            return (
-              <article
-                key={applicant.id}
-                className="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest p-space-lg shadow-sm transition-all hover:shadow-md"
-              >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex items-start gap-space-md">
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-container text-sm font-bold text-primary shadow-sm">
-                      {initials(applicant.name)}
+          visible.map((applicant) => (
+            <article
+              key={applicant._id}
+              className="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest p-space-lg shadow-sm transition-all hover:shadow-md"
+            >
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex items-start gap-space-md">
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-container text-sm font-bold text-primary shadow-sm">
+                    {initials(applicant.studentName)}
+                  </div>
+                  <div className="flex min-w-0 flex-col">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-bold text-primary">
+                        {applicant.studentName}
+                      </span>
+                      <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-xs text-on-surface">
+                        {applicant.subject}
+                      </span>
                     </div>
-                    <div className="flex min-w-0 flex-col">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-primary">
-                          {applicant.name}
-                        </span>
-                        <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-xs text-on-surface">
-                          {applicant.institution}
-                        </span>
-                        <span className="rounded-full bg-surface-container px-2 py-0.5 text-xs text-outline">
-                          {applicant.classLevel}
-                        </span>
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-on-surface-variant">
-                        <span className="inline-flex items-center gap-1">
-                          <Mail className="size-3.5 text-secondary" aria-hidden="true" />
-                          {applicant.email}
-                        </span>
+                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-on-surface-variant">
+                      <span className="inline-flex items-center gap-1">
+                        <Mail className="size-3.5 text-secondary" aria-hidden="true" />
+                        {applicant.studentEmail}
+                      </span>
+                      {applicant.studentPhone && (
                         <span className="inline-flex items-center gap-1">
                           <Phone className="size-3.5 text-secondary" aria-hidden="true" />
-                          {applicant.phone}
+                          {applicant.studentPhone}
                         </span>
-                        <span className="inline-flex items-center gap-1">
-                          <CalendarDays className="size-3.5" aria-hidden="true" />
-                          Applied {formatAppliedDate(applicant.appliedAt)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-space-md lg:justify-end">
-                    <div className="flex flex-col lg:items-end">
-                      <span className="text-xs text-outline">Target Circular</span>
-                      <span className="text-xs font-bold text-primary">
-                        {tuition?.title ?? "Tuition"}
+                      )}
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarDays className="size-3.5" aria-hidden="true" />
+                        Applied {formatAppliedDate(applicant.appliedAt)}
                       </span>
                     </div>
-                    <span className="rounded-lg bg-surface-container-high px-3 py-1.5 text-sm font-bold text-primary">
-                      ৳{tuition?.monthlyFee.toLocaleString("en-US") ?? "—"}
-                      <span className="text-xs font-normal text-outline">/mo</span>
-                    </span>
-                    <StatusPill status={applicant.status} />
                   </div>
                 </div>
-
-                <div className="grid grid-cols-1 gap-space-md rounded-lg bg-surface-container-low p-space-md lg:grid-cols-3">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold tracking-wider text-outline uppercase">
-                      Preferred Schedule
-                    </span>
-                    <div className="mt-0.5 flex items-center gap-2">
-                      <Clock3 className="size-4 text-secondary" aria-hidden="true" />
-                      <span className="text-xs font-semibold text-on-surface">
-                        {applicant.schedule}
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-secondary">
-                      Mode: {tuition?.mode === "online" ? "Online" : `In-Person (${tuition?.location})`}
+                <div className="flex flex-wrap items-center gap-space-md lg:justify-end">
+                  <div className="flex max-w-[260px] flex-col">
+                    <span className="text-xs text-outline">Target Circular</span>
+                    <span className="text-xs font-bold text-primary">
+                      {applicant.tuitionTitle}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1 lg:col-span-2">
-                    <span className="text-xs font-semibold tracking-wider text-outline uppercase">
-                      Learning Note
-                    </span>
-                    <p className="rounded bg-surface-container-lowest p-2.5 text-xs leading-relaxed text-on-surface">
-                      {applicant.note}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                  <span className="text-xs text-outline">
-                    Reference: <span className="font-semibold text-primary">{applicant.id}</span>
+                  <span className="rounded-lg bg-surface-container-high px-3 py-1.5 text-sm font-bold text-primary">
+                    ৳{applicant.monthlyFee.toLocaleString("en-US")}
+                    <span className="text-xs font-normal text-outline">/mo</span>
                   </span>
-                  {applicant.status === "pending" ? (
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => decide(applicant.id, "rejected")}
-                        className="inline-flex items-center gap-1 rounded-lg px-4 py-2 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10"
-                      >
-                        <X className="size-4" aria-hidden="true" />
-                        Reject
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => decide(applicant.id, "accepted")}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-5 py-2 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057]"
-                      >
-                        <Check className="size-4" aria-hidden="true" />
-                        Accept Application
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-on-surface-variant">
-                      Decision recorded · {applicant.status}
-                    </span>
-                  )}
+                  <StatusPill status={applicant.status} />
                 </div>
-              </article>
-            );
-          })
+              </div>
+
+              <div className="grid grid-cols-1 gap-space-md rounded-lg bg-surface-container-low p-space-md lg:grid-cols-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold tracking-wider text-outline uppercase">
+                    Preferred Schedule
+                  </span>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <Clock3 className="size-4 text-secondary" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-on-surface">
+                      {applicant.preferredSchedule}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 lg:col-span-2">
+                  <span className="text-xs font-semibold tracking-wider text-outline uppercase">
+                    Learning Note
+                  </span>
+                  <p className="rounded bg-surface-container-lowest p-2.5 text-xs leading-relaxed text-on-surface">
+                    {applicant.studentNote || "No note provided."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <span className="text-xs text-outline">
+                  Reference: <span className="font-semibold text-primary">{applicant._id}</span>
+                </span>
+                {applicant.status === "pending" ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={busyId === applicant._id}
+                      onClick={() => decide(applicant._id, "rejected")}
+                      className="inline-flex items-center gap-1 rounded-lg px-4 py-2 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                    >
+                      <X className="size-4" aria-hidden="true" />
+                      Reject
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busyId === applicant._id}
+                      onClick={() => decide(applicant._id, "accepted")}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-5 py-2 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50"
+                    >
+                      <Check className="size-4" aria-hidden="true" />
+                      Accept Application
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-xs text-on-surface-variant">
+                    Decision recorded · {applicant.status}
+                  </span>
+                )}
+              </div>
+            </article>
+          ))
         )}
       </div>
     </div>

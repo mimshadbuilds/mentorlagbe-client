@@ -19,6 +19,11 @@ import {
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const redirectTo = () => {
+        const value = new URLSearchParams(window.location.search).get("redirectTo");
+        return value?.startsWith("/") && !value.startsWith("//") ? value : "/";
+    };
+
     const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -32,7 +37,7 @@ import {
         const { data, error } = await signIn.email({
             email,
             password,
-            callbackURL: "/",
+            callbackURL: redirectTo(),
         });
 
         if (error) {
@@ -54,7 +59,7 @@ import {
         try {
         await signIn.social({
             provider: "google",
-            callbackURL: "/",
+            callbackURL: redirectTo(),
         });
         } catch {
         toast.error("Google sign in failed. Please try again.");

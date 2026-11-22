@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import UpdateProfileForm from "@/components/dashboard/profile-form";
+import UpdateProfileForm from "@/components/dashboard/profile/profile-form";
 import type { UserRole } from "@/components/layout/AuthUser";
 import { auth } from "@/lib/auth";
 

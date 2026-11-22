@@ -11,9 +11,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { dashboardNav, isActivePath } from "../../../app/types/config";
 
 function activeLabel(pathname: string, role: UserRole | null): string {
-  if (pathname.startsWith("/dashboard/profile")) return "Update Profile";
+  if(pathname.startsWith("/dashboard/profile")) return "Update Profile";
 
-  if (role) {
+  if(role) {
     const item = dashboardNav[role].find((nav) => isActivePath(pathname, nav.href));
     if (item) return item.label;
   }

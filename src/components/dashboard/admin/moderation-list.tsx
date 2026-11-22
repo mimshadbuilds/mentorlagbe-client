@@ -42,18 +42,13 @@ function StatusBadge({ status }: { status: TApproval }) {
       className={cn(
         "rounded-full px-2.5 py-0.5 text-xs font-semibold",
         className
-      )}
-    >
+      )}>
       {label}
     </span>
   );
 }
 
-export default function ModerationList({
-  tuitions,
-}: {
-  tuitions: ITuition[];
-}) {
+export default function ModerationList({ tuitions }: { tuitions: ITuition[] }) {
   const router = useRouter();
 
   const [filter, setFilter] = useState<StatusFilter>("pending");
@@ -73,8 +68,7 @@ export default function ModerationList({
     ).length,
   };
 
-  const filtered = useMemo(
-    () =>
+  const filtered = useMemo(() =>
       tuitions.filter(
         (item) =>
           (filter === "all" || item.approvalStatus === filter) &&
@@ -86,8 +80,7 @@ export default function ModerationList({
     [tuitions, filter, query]
   );
 
-  const handleApproval = async (
-    tuition: ITuition,
+  const handleApproval = async (tuition: ITuition,
     approvalStatus: "approved" | "rejected"
   ) => {
     setBusyId(tuition._id);
@@ -95,7 +88,14 @@ export default function ModerationList({
     try {
       await setTuitionApproval(tuition._id, approvalStatus);
 
-      toast.success(`Tuition ${approvalStatus}`);
+      const actionLabel =
+        tuition.approvalStatus === "approved"
+          ? "revoked"
+          : tuition.approvalStatus === "rejected"
+            ? "reinstated"
+            : approvalStatus;
+
+      toast.success(`Tuition ${actionLabel} successfully.`);
       router.refresh();
     } catch (error) {
       toast.error(
@@ -133,8 +133,7 @@ export default function ModerationList({
                   filter === tab.key
                     ? "bg-surface-container-lowest font-semibold text-primary shadow-xs"
                     : "text-on-surface-variant hover:text-primary"
-                )}
-              >
+                )}>
                 {tab.label}
                 <span className="ml-1 font-semibold opacity-75">
                   ({counts[tab.key]})
@@ -194,51 +193,41 @@ export default function ModerationList({
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="py-10 text-center text-sm text-on-surface-variant"
-                >
+                  className="py-10 text-center text-sm text-on-surface-variant">
                   No tuition posts found
                   {query.trim() ? ` for "${query.trim()}"` : ""}.
                 </TableCell>
               </TableRow>
             ) : (
               filtered.map((tuition) => (
-                <TableRow
-                  key={tuition._id}
-                  className="hover:bg-surface-container-low/60"
-                >
+                <TableRow key={tuition._id}
+                  className="hover:bg-surface-container-low/60">
                   <TableCell className="px-space-lg py-4">
                     <div className="flex min-w-[220px] flex-col">
                       <span className="text-sm font-bold text-primary">
                         {tuition.title}
                       </span>
-
                       <span className="text-xs text-on-surface-variant">
                         {tuition.subject} • {tuition.classLevel}
                       </span>
                     </div>
                   </TableCell>
-
                   <TableCell className="px-space-md py-4">
                     <div className="flex min-w-[160px] flex-col">
                       <span className="text-xs font-bold text-primary">
                         {tuition.tutorName}
                       </span>
-
                       <span className="text-xs text-outline">
                         {tuition.tutorEmail}
                       </span>
                     </div>
                   </TableCell>
-
                   <TableCell className="px-space-md py-4">
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-primary">
                         ৳{tuition.monthlyFee.toLocaleString("en-US")}
-                        <span className="text-xs font-normal text-outline">
-                          /mo
-                        </span>
+                        <span className="text-xs font-normal text-outline">/mo</span>
                       </span>
-
                       <span className="text-xs text-on-surface-variant">
                         {tuition.mode === "Online"
                           ? "Online"
@@ -260,36 +249,55 @@ export default function ModerationList({
                   </TableCell>
 
                   <TableCell className="px-space-lg py-4">
-                    {tuition.approvalStatus === "pending" && (
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          disabled={busyId === tuition._id}
-                          onClick={() =>
-                            handleApproval(tuition, "approved")
-                          }
-                          className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-semibold text-on-secondary shadow-sm transition-colors hover:bg-[#156057] disabled:opacity-50"
-                        >
-                          <CircleCheck
-                            className="size-3.5"
-                            aria-hidden="true"
-                          />
-                          Approve
-                        </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      {tuition.approvalStatus === "pending" && (
+                        <>
+                          <button
+                            type="button"
+                            disabled={busyId === tuition._id}
+                            onClick={() => handleApproval(tuition, "approved")}
+                            className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-semibold text-on-secondary shadow-sm transition-colors hover:bg-[#156057] disabled:opacity-50"
+                          >
+                            <CircleCheck className="size-3.5" />
+                            Approve
+                          </button>
 
+                          <button
+                            type="button"
+                            disabled={busyId === tuition._id}
+                            onClick={() => handleApproval(tuition, "rejected")}
+                            className="inline-flex items-center gap-1 rounded-lg bg-surface-container-high px-2.5 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                          >
+                            <Ban className="size-3.5" />
+                            Reject
+                          </button>
+                        </>
+                      )}
+
+                      {tuition.approvalStatus === "approved" && (
                         <button
                           type="button"
                           disabled={busyId === tuition._id}
-                          onClick={() =>
-                            handleApproval(tuition, "rejected")
-                          }
-                          className="inline-flex items-center gap-1 rounded-lg bg-surface-container-high px-2.5 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                          onClick={() => handleApproval(tuition, "rejected")}
+                          className="inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2.5 py-1.5 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-50"
                         >
-                          <Ban className="size-3.5" aria-hidden="true" />
-                          Reject
+                          <Ban className="size-3.5" />
+                          Revoke
                         </button>
-                      </div>
-                    )}
+                      )}
+
+                      {tuition.approvalStatus === "rejected" && (
+                        <button
+                          type="button"
+                          disabled={busyId === tuition._id}
+                          onClick={() => handleApproval(tuition, "approved")}
+                          className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-semibold text-on-secondary transition-colors hover:bg-[#156057] disabled:opacity-50"
+                        >
+                          <CircleCheck className="size-3.5" />
+                          Reinstate
+                        </button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -301,7 +309,6 @@ export default function ModerationList({
           <span>
             Showing 1 to {filtered.length} of {tuitions.length} posts
           </span>
-
           <span>{counts.pending} awaiting review</span>
         </div>
       </div>

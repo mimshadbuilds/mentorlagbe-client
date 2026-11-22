@@ -115,6 +115,13 @@ token from `authHeader()` 401s against backend `verifyToken`.
   store stays for the other dashboard surfaces. Applicant counts still come
   from the seed until Phase C. Verified by `check-my-tuitions.ps1` (14/14) and
   `check-tutor-crud.ps1` (5/5).
+- **Pricing + payment status pages (gap-fill)** `/pricing` (Free vs Pro for both
+  roles, $15/$10) and `/payment/success`, `/payment/cancel` (design clones from
+  the stitch folders). `startCheckout` in `actions/payment.ts` POSTs
+  `{plan:"pro", role}` to backend `POST /payments/checkout` and redirects to its
+  `url` — backend not built yet, so the CTA toasts a clear error until then.
+  `searchParams` reads sit behind `<Suspense>` (Next 16 otherwise fails build).
+  Verified by `check-pricing-payment.ps1` (19/19).
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

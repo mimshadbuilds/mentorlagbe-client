@@ -35,28 +35,3 @@ export const updateProfile = async (data: { phone: string; bio: string }) => {
 
     return result;
 };
-
-export const uploadProfileImage = async (file: File) => {
-    if (!baseURL) throw new Error("API URL is not configured.");
-
-    const uploadData = new FormData();
-        uploadData.append("image", file);
-
-    const res = await fetch(`${baseURL}/upload/image`, {
-        method: "POST",
-        headers: await getAuthHeaders(),
-        body: uploadData,
-    });
-
-    const result = await res.json();
-
-    if (!res.ok) {
-        throw new Error(result.message || "Image upload failed.");
-    }
-
-    if (!result.imageUrl) {
-        throw new Error("The server did not return an image URL.");
-    }
-
-    return result;
-};

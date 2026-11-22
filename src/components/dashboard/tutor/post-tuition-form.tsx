@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createTuition } from "@/lib/actions/tution";
+import TuitionBannerUpload from "@/components/dashboard/tutor/tuition-banner-upload";
 
 const subjects = [
   "Physics",
@@ -360,7 +361,7 @@ export default function PostTuitionForm() {
               Choose a banner
             </span>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               {presets.map((preset) => (
                 <button
                   key={preset}
@@ -381,6 +382,11 @@ export default function PostTuitionForm() {
                 </button>
               ))}
             </div>
+
+            <TuitionBannerUpload
+              onBannerChange={setBanner}
+              disabled={isSubmitting}
+            />
           </div>
 
           <div className="flex items-center justify-end gap-3">

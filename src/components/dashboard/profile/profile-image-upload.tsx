@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { uploadProfileImage } from "@/lib/actions/profile";
+import { uploadImage } from "@/lib/actions/image";
 
 interface IProfileImageUploadProps {
     name: string;
@@ -47,8 +47,8 @@ export default function ProfileImageUpload({ name, image, onImageChange, disable
     setUploading(true);
 
     try {
-        const result = await uploadProfileImage(file);
-        onImageChange(result.imageUrl);
+        const imageUrl = await uploadImage(file);        
+        onImageChange(imageUrl);
         setPreview(null);
         toast.success("Profile picture uploaded successfully.");
     } catch (error) {

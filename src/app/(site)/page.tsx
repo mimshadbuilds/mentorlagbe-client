@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import HeroSection from "@/components/home/hero";
 import FeaturedTuitions from "@/components/home/featured-tuitions";
 import HowItWorks from "@/components/home/how-it-works";
@@ -7,15 +8,24 @@ import PricingCards from "@/components/home/pricing";
 import FinalCta from "@/components/home/final-cta";
 
 export default function Home() {
-  return (
-    <>
-      <HeroSection />
-      <FeaturedTuitions />
-      <HowItWorks />
-      <PopularSubjects />
-      <Statistics />
-      <PricingCards />
-      <FinalCta />
-    </>
-  );
+    return (
+        <>
+          <HeroSection />
+            <Suspense
+                fallback={
+                    <section className="bg-surface-container-lowest py-20">
+                        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+                            <div className="h-9 w-56 animate-pulse rounded-lg bg-surface-container-low" />
+                        </div>
+                    </section>
+                }>
+                <FeaturedTuitions />
+            </Suspense>
+            <HowItWorks />
+            <PopularSubjects />
+            <Statistics />
+            <PricingCards />
+            <FinalCta />
+        </>
+    );
 }

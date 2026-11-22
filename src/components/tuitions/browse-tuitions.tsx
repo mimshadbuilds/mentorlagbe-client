@@ -14,6 +14,7 @@ import TuitionsCard from "@/components/layout/TuitionsCard";
 import type { ITuition } from "@/lib/actions/tuition-query";
 import { cn } from "cn";
 import Link from "next/link";
+import {SUBJECT_OPTIONS, CLASS_LEVEL_OPTIONS } from "@/lib/constants/tuition-options";
 
 const PAGE_SIZE = 9;
 
@@ -29,24 +30,25 @@ const emptyFilters: Record<FilterKey, string> = {
 
 const subjectOptions = [
   { value: "", label: "All Subjects" },
-  { value: "Higher Math", label: "Higher Math" },
-  { value: "Physics", label: "Physics" },
-  { value: "Chemistry", label: "Chemistry" },
-  { value: "Biology", label: "Biology" },
-  { value: "English", label: "English" },
-  { value: "ICT", label: "ICT & Computing" },
+  ...SUBJECT_OPTIONS.map((subject) => ({
+    value: subject,
+    label: subject === "ICT" ? "ICT & Computing" : subject,
+  })),
 ];
 
 const classOptions = [
   { value: "", label: "All Curricula / Levels" },
-  { value: "Class 9-10 (SSC)", label: "Class 9-10 (SSC)" },
-  { value: "HSC 11-12", label: "HSC 11-12" },
-  { value: "O-Level", label: "O-Level (CAIE/Edexcel)" },
-  { value: "A-Level", label: "A-Level (CAIE/Edexcel)" },
-  { value: "Admission Prep", label: "University Admission" },
+  ...CLASS_LEVEL_OPTIONS.map((level) => ({
+    value: level,
+    label:
+      level === "SSC 9-10"
+        ? "Class 9-10 (SSC)"
+        : level === "Admission Prep"
+          ? "University Admission"
+          : level,
+  })),
 ];
 
-// Values mirror the backend mode enum (Online / Offline); labels are UI copy.
 const modeOptions = [
   { value: "", label: "All Modes" },
   { value: "Online", label: "Online Live Batch" },
@@ -71,12 +73,27 @@ const sortOptions = [
 ];
 
 const quickFilters = [
-  { label: "Maths (A-Levels)", subject: "Higher Math", classLevel: "A-Level" },
-  { label: "HSC Chemistry (Board CQ)", subject: "Chemistry", classLevel: "HSC 11-12" },
-  { label: "IELTS & O-Level English", subject: "English", classLevel: "" },
-  { label: "SSC Physics Foundation", subject: "Physics", classLevel: "Class 9-10 (SSC)" },
+  {
+    label: "Maths (A-Levels)",
+    subject: "Higher Math",
+    classLevel: "A-Level",
+  },
+  {
+    label: "HSC Chemistry (Board CQ)",
+    subject: "Chemistry",
+    classLevel: "HSC 11-12",
+  },
+  {
+    label: "IELTS & O-Level English",
+    subject: "English",
+    classLevel: "",
+  },
+  {
+    label: "SSC Physics Foundation",
+    subject: "Physics",
+    classLevel: "SSC 9-10",
+  },
 ];
-
 interface FilterSelectProps {
   id: string;
   label: string;
@@ -111,11 +128,17 @@ function FilterSelect({ id, label, value, options, onChange }: FilterSelectProps
 
 export default function BrowseTuitions({
   tuitions,
+  initialSearch = "",
 }: {
   /** Approved listings fetched server-side from mentorlagbe-server. */
   tuitions: ITuition[];
+  /** Pre-filled search text, e.g. ?q= from the 404 recovery search box. */
+  initialSearch?: string;
 }) {
-  const [filters, setFilters] = useState(emptyFilters);
+  const [filters, setFilters] = useState({
+    ...emptyFilters,
+    search: initialSearch,
+  });
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
 
@@ -135,39 +158,32 @@ export default function BrowseTuitions({
     setPage(1);
   };
 
-  // Client-side search & filter, we will moves this to server-side later
   const filteredTuitions = useMemo(() => {
     const query = filters.search.trim().toLowerCase();
 
     const matches = tuitions.filter((tuition) => {
-      if (
+      if(
         query &&
         !tuition.title.toLowerCase().includes(query) &&
         !tuition.subject.toLowerCase().includes(query)
       ) {
         return false;
       }
-      if (
-        filters.subject &&
-        !tuition.subject.toLowerCase().includes(filters.subject.toLowerCase())
-      ) {
+      if (filters.subject && tuition.subject !== filters.subject) {
         return false;
       }
-      if (
-        filters.classLevel &&
-        !tuition.classLevel.toLowerCase().includes(filters.classLevel.toLowerCase())
-      ) {
+      if (filters.classLevel && tuition.classLevel !== filters.classLevel) {
         return false;
       }
-      if (
+      if(
         filters.mode &&
         !tuition.mode.toLowerCase().includes(filters.mode.toLowerCase())
       ) {
         return false;
       }
-      if (
+      if(
         filters.location &&
-        !tuition.location.toLowerCase().includes(filters.location.toLowerCase())
+        !(tuition.location ?? "").toLowerCase().includes(filters.location.toLowerCase())
       ) {
         return false;
       }

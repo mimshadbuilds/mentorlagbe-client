@@ -100,10 +100,18 @@ token from `authHeader()` 401s against backend `verifyToken`.
   Added `phone`/`bio` as user `additionalFields` in `auth.ts` (no backend endpoint
   needed). `TODO(backend)` for direct ImgBB upload (no API key in `.env`); design
   extras parked as notes items 31–35.
+- **Phase 13** 404 + error pages (user-requested design clone, not in docx) —
+  root `not-found.tsx` (mentorlagbe_404_not_found: badge, 404/Error cue, recovery
+  search `GET /tuitions?q=` → `initialSearch` prop on BrowseTuitions, quick links,
+  help strip), shared `components/error-screen.tsx` (mentorlagbe_global_error_500)
+  used by root `error.tsx` (`{error, retry}` per Next 16) and `global-error.tsx`
+  (own html/body + globals.css). Notes items 36–38 park the substitutions.
+  Verified by `check-404-error.ps1` (31/31) — see gotchas below.
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
-  (Challenge 3). From Phase 11 the backend still owes: `GET /admin/stats`,
-  `GET /admin/users`, `PATCH /admin/users/:id/role`, extended
-  `GET /admin/tuitions`, `PATCH /admin/tuitions/:id/approval`, `GET /admin/transactions`.
+  (Challenge 3, another session already committed imgbb work). From Phase 11 the
+  backend still owes: `GET /admin/stats`, `GET /admin/users`,
+  `PATCH /admin/users/:id/role`, extended `GET /admin/tuitions`,
+  `PATCH /admin/tuitions/:id/approval`, `GET /admin/transactions`.
 
 ## Verification ritual (run before reporting any phase done)
 
@@ -128,6 +136,18 @@ token from `authHeader()` 401s against backend `verifyToken`.
 - Streamed `notFound()` keeps status **200** + adds `<meta name="robots"
   content="noindex">` (documented in `loading.md` → Status codes). The checker
   asserts that behavior instead of a 404 status.
+- The `/` homepage hits the same `blocking-prerender-dynamic` rule once
+  `FeaturedTuitions` became a live fetch — fixed by wrapping it in `<Suspense>`
+  directly in `(site)/page.tsx` (no segment `loading.tsx` needed).
+- Streamed not-found markup arrives inside inline `<script>` swap chunks —
+  checkers that strip `<script>` before matching won't see it; match the raw
+  body for `notFound()` assertions.
+- `error.tsx` renders **client-side**: the SSR body is an empty shell plus a
+  serialized error payload. Verify the UI with headless Chrome `--dump-dom`,
+  capturing stdout via `System.Diagnostics.Process` (the `& $chrome` call
+  operator captures nothing). Probe route must not start with `_` (private
+  folder → no route); checker uses a temp `src/app/error-probe/page.tsx`,
+  added and removed around the run.
 
 ## Conventions
 

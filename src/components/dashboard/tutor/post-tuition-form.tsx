@@ -18,32 +18,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createTuition } from "@/lib/actions/tution";
 import TuitionBannerUpload from "@/components/dashboard/tutor/tuition-banner-upload";
+import {
+  SUBJECT_OPTIONS,
+  CLASS_LEVEL_OPTIONS,
+  DAYS_OPTIONS,
+} from "@/lib/constants/tuition-options";
 
-const subjects = [
-  "Physics",
-  "Higher Math",
-  "Chemistry",
-  "Biology",
-  "English",
-  "ICT",
-  "General Science",
-];
-
-const levels = [
-  "HSC 11-12",
-  "SSC 9-10",
-  "O-Level",
-  "A-Level",
-  "Admission Prep",
-  "IELTS"
-];
-
-const daysOptions = [
-  "2 days / week",
-  "3 days / week",
-  "4 days / week",
-  "5 days / week",
-];
 
 const presets = [
   "/tuitions/tuition-7.jpg",
@@ -197,9 +177,11 @@ export default function PostTuitionForm() {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   className={fieldClass}>
-                  {subjects.map((item) => (
-                    <option key={item}>{item}</option>
-                  ))}
+                {SUBJECT_OPTIONS.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
                 </select>
               </div>
 
@@ -214,8 +196,10 @@ export default function PostTuitionForm() {
                   value={classLevel}
                   onChange={(e) => setClassLevel(e.target.value)}
                   className={fieldClass}>
-                  {levels.map((item) => (
-                    <option key={item}>{item}</option>
+                  {CLASS_LEVEL_OPTIONS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -307,8 +291,10 @@ export default function PostTuitionForm() {
                   value={days}
                   onChange={(e) => setDays(e.target.value)}
                   className={fieldClass}>
-                  {daysOptions.map((item) => (
-                    <option key={item}>{item}</option>
+                  {DAYS_OPTIONS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
                   ))}
                 </select>
               </div>

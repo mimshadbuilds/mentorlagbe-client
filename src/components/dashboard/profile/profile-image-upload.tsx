@@ -29,13 +29,20 @@ export default function ProfileImageUpload({ name, image, onImageChange, disable
     const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
-    if (!file) return;
+    if(!file) return;
 
-    if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file.");
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+        ];
+
+    if(!allowedTypes.includes(file.type)) {
+        toast.error("Only JPEG, PNG, WEBP, and GIF images are allowed.");
         e.target.value = "";
         return;
-    }
+        }
 
     if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size must be 5MB or less.");

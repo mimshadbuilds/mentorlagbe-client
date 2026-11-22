@@ -159,12 +159,29 @@ export default function ModerationList({ tuitions }: { tuitions: ITuition[] }) {
               filtered.map((tuition) => (
                 <TableRow key={tuition._id} className="hover:bg-surface-container-low/60">
                   <TableCell className="px-space-lg py-4">
-                    <div className="flex min-w-[220px] flex-col">
-                      <span className="text-sm font-bold text-primary">{tuition.title}</span>
-                      <span className="text-xs text-on-surface-variant">
-                        {tuition.subject} • {tuition.classLevel}
-                      </span>
-                    </div>
+                      {tuition.approvalStatus === "pending" && (
+                          <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                  type="button"
+                                  disabled={busyId === tuition._id}
+                                  onClick={() => handleApproval(tuition, "approved")}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-semibold text-on-secondary shadow-sm transition-colors hover:bg-[#156057] disabled:opacity-50"
+                              >
+                                  <CircleCheck className="size-3.5" aria-hidden="true" />
+                                  Approve
+                              </button>
+
+                              <button
+                                  type="button"
+                                  disabled={busyId === tuition._id}
+                                  onClick={() => handleApproval(tuition, "rejected")}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-surface-container-high px-2.5 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                              >
+                                  <Ban className="size-3.5" aria-hidden="true" />
+                                  Reject
+                              </button>
+                          </div>
+                      )}
                   </TableCell>
                   <TableCell className="px-space-md py-4">
                     <div className="flex min-w-[160px] flex-col">

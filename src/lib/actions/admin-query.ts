@@ -85,13 +85,23 @@ export const getAdminTuitions = async (): Promise<ITuition[]> => {
     }
 };
 
+
 export const getAdminTransactions = async (): Promise<IAdminTransaction[]> => {
     const res = await adminFetch("/admin/transactions");
+
     if (!res) return [];
-      try {
-        const result = await res.json()
-        return result as IAdminTransaction[];
-      } catch {
+
+    try {
+        const result = await res.json();
+
+        return (result as (Omit<IAdminTransaction, "status"> & {
+            paymentStatus?: string;
+        })[]).map((transaction) => ({
+            ...transaction,
+            status: transaction.paymentStatus,
+        }));
+    } catch {
         return [];
     }
 };
+

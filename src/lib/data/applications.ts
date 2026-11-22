@@ -64,7 +64,9 @@ export function getApplicationStats(applications: ApplicationRow[]) {
 
 /** "2026-10-24" → "Oct 24, 2026" */
 export function formatAppliedDate(iso: string): string {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
+  const date = new Date(iso.includes("T") ? iso : `${iso}T00:00:00`);
+
+  return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

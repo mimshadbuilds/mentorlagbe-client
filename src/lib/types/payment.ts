@@ -19,6 +19,7 @@ export interface IPaymentStatus {
   transactionId?: string;
   paidAt?: string;
   plan?: string;
+  message?: string;
 }
 
 export interface ICurrentProfile {

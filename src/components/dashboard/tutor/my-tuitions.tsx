@@ -41,13 +41,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { tutorApplicants } from "@/lib/data/tutor";
 import {
   deleteTuition,
   setTuitionActive,
   updateTuition,
 } from "@/lib/actions/tution";
 import type { ITuition } from "@/lib/actions/tuition-query";
+import type { IApplication } from "@/lib/types/application";
 
 type StatusFilter = "all" | "approved" | "pending" | "closed" | "rejected";
 
@@ -59,7 +59,13 @@ const filters: { key: StatusFilter; label: string }[] = [
   { key: "rejected", label: "Rejected" },
 ];
 
-export default function MyTuitions({ tuitions }: { tuitions: ITuition[] }) {
+export default function MyTuitions({
+  tuitions,
+  applications,
+}: {
+  tuitions: ITuition[];
+  applications: IApplication[];
+}) {
   const router = useRouter();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
@@ -251,7 +257,7 @@ export default function MyTuitions({ tuitions }: { tuitions: ITuition[] }) {
           </div>
         ) : (
           visible.map((tuition) => {
-            const applicantCount = tutorApplicants.filter(
+            const applicantCount = applications.filter(
               (applicant) => applicant.tuitionId === tuition._id
             ).length;
             const approved = tuition.approvalStatus === "approved";

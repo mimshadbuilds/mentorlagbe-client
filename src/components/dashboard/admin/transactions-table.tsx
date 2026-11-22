@@ -122,7 +122,10 @@ export default function TransactionsTable({ transactions }: { transactions: IAdm
                     {item.planName}
                   </TableCell>
                   <TableCell className="px-space-md py-4 text-sm font-bold text-primary">
-                    ${item.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: (item.currency || "usd").toUpperCase(),
+                    }).format(item.amount > 100 ? item.amount / 100 : item.amount)}
                   </TableCell>
                   <TableCell className="px-space-md py-4 font-mono text-xs text-on-surface-variant">
                     {item.transactionId}

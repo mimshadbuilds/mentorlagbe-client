@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Archive,
   BadgeCheck,
@@ -33,15 +34,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  formatAppliedDate,
-  getApplicationStats,
-  getApplications,
-  type ApplicationRow,
-  type ApplicationStatus,
-} from "@/lib/data/applications";
+import { cancelApplication } from "@/lib/actions/application";
+import { formatAppliedDate } from "@/lib/data/applications";
+import type { IApplication, TApplicationStatus } from "@/lib/types/application";
 
-type StatusFilter = "all" | ApplicationStatus;
+type StatusFilter = "all" | TApplicationStatus;
 
 const statusTabs: { key: StatusFilter; label: string; countClassName?: string }[] = [
   { key: "all", label: "All" },
@@ -50,12 +47,11 @@ const statusTabs: { key: StatusFilter; label: string; countClassName?: string }[
   { key: "rejected", label: "Rejected", countClassName: "text-outline" },
 ];
 
-function tutorInitials(name: string): string {
-  const words = name.replace(/^(Dr\.|Engr\.|Md\.)\s*/, "").trim().split(/\s+/);
+function tutorInitials(email: string): string {
+  const words = email.replace(/@.*$/, "").split(/[._-]/);
   return `${words[0]?.[0] ?? ""}${words[1]?.[0] ?? ""}`.toUpperCase();
 }
 
-/** Small metric card in the page header (design's "Quick Metric Cards"). */
 function QuickMetric({
   icon: Icon,
   value,
@@ -84,7 +80,7 @@ function QuickMetric({
   );
 }
 
-function StatusBadge({ status }: { status: ApplicationStatus }) {
+function StatusBadge({ status }: { status: TApplicationStatus }) {
   if (status === "pending") {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary-fixed px-3 py-1 text-xs font-semibold text-on-tertiary-fixed-variant">
@@ -109,18 +105,24 @@ function StatusBadge({ status }: { status: ApplicationStatus }) {
   );
 }
 
-/**
- * TODO(backend): data comes from the seeded client dataset — swap for
- * mentorlagbe-server /applications and a DELETE endpoint for cancellations.
- */
-export default function ApplicationsTable() {
-  const [applications, setApplications] = useState<ApplicationRow[]>(getApplications);
+export default function ApplicationsTable({
+  applications,
+}: {
+  applications: IApplication[];
+}) {
+  const router = useRouter();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
-  const [cancelTarget, setCancelTarget] = useState<ApplicationRow | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<IApplication | null>(null);
   const [revealedContact, setRevealedContact] = useState<string[]>([]);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-  const stats = getApplicationStats(applications);
+  const stats = {
+    total: applications.length,
+    pending: applications.filter((item) => item.status === "pending").length,
+    accepted: applications.filter((item) => item.status === "accepted").length,
+    rejected: applications.filter((item) => item.status === "rejected").length,
+  };
 
   const filtered = useMemo(
     () =>
@@ -128,7 +130,7 @@ export default function ApplicationsTable() {
         (application) =>
           (filter === "all" || application.status === filter) &&
           (query.trim() === "" ||
-            `${application.tuition.title} ${application.tuition.tutorName} ${application.tuition.subject}`
+            `${application.tuitionTitle} ${application.tutorEmail} ${application.subject}`
               .toLowerCase()
               .includes(query.trim().toLowerCase()))
       ),
@@ -140,14 +142,24 @@ export default function ApplicationsTable() {
     setQuery("");
   };
 
-  const handleConfirmCancel = () => {
-    if (!cancelTarget) return;
-    // TODO(backend): DELETE mentorlagbe-server /applications/:id
-    setApplications((prev) => prev.filter((item) => item.id !== cancelTarget.id));
-    toast.success("Application cancelled", {
-      description: `Your inquiry for "${cancelTarget.tuition.title}" was withdrawn.`,
-    });
-    setCancelTarget(null);
+  const handleConfirmCancel = async () => {
+    if (!cancelTarget || busyId) return;
+    setBusyId(cancelTarget._id);
+
+    try {
+      await cancelApplication(cancelTarget._id);
+      toast.success("Application cancelled", {
+        description: `Your inquiry for "${cancelTarget.tuitionTitle}" was withdrawn.`,
+      });
+      setCancelTarget(null);
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to cancel the application."
+      );
+    } finally {
+      setBusyId(null);
+    }
   };
 
   return (
@@ -213,7 +225,7 @@ export default function ApplicationsTable() {
                     "ml-1 font-semibold",
                     filter === tab.key ? "opacity-75" : tab.countClassName
                   )}>
-                  ({tab.key === "all" ? stats.total : stats[tab.key as ApplicationStatus]})
+                  ({tab.key === "all" ? stats.total : stats[tab.key as TApplicationStatus]})
                 </span>
               </button>
             ))}
@@ -278,21 +290,18 @@ export default function ApplicationsTable() {
               filtered.map((row) => {
                 const isRejected = row.status === "rejected";
                 const isAccepted = row.status === "accepted";
-                const contactRevealed = revealedContact.includes(row.id);
+                const contactRevealed = revealedContact.includes(row._id);
 
                 return (
-                  <TableRow key={row.id} className="hover:bg-surface-container-low/60">
+                  <TableRow key={row._id} className="hover:bg-surface-container-low/60">
                     <TableCell className="px-space-lg py-4">
                       <div className="flex min-w-[220px] flex-col">
                         <span className="text-sm font-bold text-primary">
-                          {row.tuition.title}
+                          {row.tuitionTitle}
                         </span>
                         <div className="mt-0.5 flex items-center gap-1.5">
                           <span className="rounded bg-surface-container px-2 py-0.5 text-xs text-on-surface-variant">
-                            {row.tuition.subject}
-                          </span>
-                          <span className="text-xs text-outline">
-                            • {row.tuition.classLevel}
+                            {row.subject}
                           </span>
                         </div>
                       </div>
@@ -309,7 +318,7 @@ export default function ApplicationsTable() {
                                 ? "bg-secondary-container text-on-secondary-container"
                                 : "bg-primary-container text-primary"
                           )}>
-                          {tutorInitials(row.tuition.tutorName)}
+                          {tutorInitials(row.tutorEmail)}
                         </span>
                         <div className="flex min-w-0 flex-col">
                           <div className="flex items-center gap-1">
@@ -318,7 +327,7 @@ export default function ApplicationsTable() {
                                 "text-xs font-bold",
                                 isRejected ? "text-on-surface-variant" : "text-on-surface"
                               )}>
-                              {row.tuition.tutorName}
+                              {row.tutorEmail.split("@")[0]}
                             </span>
                             {!isRejected && (
                               <BadgeCheck
@@ -328,7 +337,7 @@ export default function ApplicationsTable() {
                             )}
                           </div>
                           <span className="truncate text-xs text-outline">
-                            {row.tuition.tutorEmail}
+                            Assigned Tutor
                           </span>
                         </div>
                       </div>
@@ -340,7 +349,7 @@ export default function ApplicationsTable() {
                           "text-sm font-bold",
                           isRejected ? "text-outline" : "text-primary"
                         )}>
-                        ৳{row.tuition.monthlyFee.toLocaleString("en-US")}
+                        ৳{row.monthlyFee.toLocaleString("en-US")}
                       </span>
                       <span className="text-xs text-outline">/mo</span>
                     </TableCell>
@@ -363,20 +372,21 @@ export default function ApplicationsTable() {
                       {row.status === "pending" ? (
                         <button
                           type="button"
+                          disabled={busyId === row._id}
                           onClick={() => setCancelTarget(row)}
-                          className="rounded-lg bg-surface-container-high px-3 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive">
+                          className="rounded-lg bg-surface-container-high px-3 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50">
                           Cancel Application
                         </button>
                       ) : isAccepted ? (
                         contactRevealed ? (
                           <span className="text-xs font-semibold text-primary">
-                            {row.tuition.tutorEmail}
+                            {row.tutorEmail}
                           </span>
                         ) : (
                           <button
                             type="button"
                             onClick={() =>
-                              setRevealedContact((prev) => [...prev, row.id])
+                              setRevealedContact((prev) => [...prev, row._id])
                             }
                             className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-xs transition-all hover:bg-primary-container hover:text-primary">
                             <Phone className="size-[15px]" aria-hidden="true" />
@@ -444,12 +454,12 @@ export default function ApplicationsTable() {
           <div className="flex flex-col gap-1 rounded-lg bg-surface-container-low p-3 text-xs">
             <div className="flex items-center justify-between">
               <span className="text-outline">Application Reference:</span>
-              <span className="font-bold text-primary">{cancelTarget?.id}</span>
+              <span className="font-bold text-primary">{cancelTarget?._id}</span>
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="shrink-0 text-outline">Assigned Mentor:</span>
               <span className="truncate font-semibold text-on-surface">
-                {cancelTarget?.tuition.tutorName}
+                {cancelTarget?.tutorEmail}
               </span>
             </div>
           </div>

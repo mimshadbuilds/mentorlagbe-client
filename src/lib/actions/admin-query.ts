@@ -28,6 +28,7 @@ export interface IAdminTransaction {
   userRole: "student" | "tutor" | "admin";
   planName: string;
   amount: number;
+  currency?: string;
   transactionId: string;
   paidAt: string;
   status?: string;

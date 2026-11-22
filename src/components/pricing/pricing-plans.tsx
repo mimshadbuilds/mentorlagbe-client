@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,14 +10,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "@/lib/auth-client";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { getCurrentProfile, startCheckout } from "@/lib/actions/payment";
-import type {
-  ICurrentProfile,
-  TProPlan,
-  TUserRole,
-} from "@/lib/types/payment";
+import { startCheckout } from "@/lib/actions/payment";
+import type { TProPlan, TUserPlan, TUserRole } from "@/lib/types/payment";
 
 const plans: {
   planId: TProPlan;
@@ -68,41 +63,18 @@ const plans: {
   },
 ];
 
-export default function PricingPlans() {
-  const { data: session, isPending } = useSession();
-  const [profile, setProfile] = useState<ICurrentProfile | null>(null);
-  const [checkingPlan, setCheckingPlan] = useState(true);
+type PricingPlansProps = {
+  signedIn: boolean;
+  role: TUserRole | null;
+  plan: TUserPlan;
+};
+
+export default function PricingPlans({
+  signedIn,
+  role,
+  plan,
+}: PricingPlansProps) {
   const [busyPlan, setBusyPlan] = useState<TProPlan | null>(null);
-  const userId = session?.user?.id;
-  const role = session?.user?.role as TUserRole | undefined;
-
-  useEffect(() => {
-    if (isPending) return;
-
-    if (!userId) {
-      setProfile(null);
-      setCheckingPlan(false);
-      return;
-    }
-
-    let active = true;
-    setCheckingPlan(true);
-
-    getCurrentProfile()
-      .then((data) => {
-        if (active) setProfile(data);
-      })
-      .catch(() => {
-        if (active) setProfile(null);
-      })
-      .finally(() => {
-        if (active) setCheckingPlan(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [userId, isPending]);
 
   const handleCheckout = async (planId: TProPlan) => {
     if (busyPlan) return;
@@ -121,16 +93,8 @@ export default function PricingPlans() {
     }
   };
 
-  const proCta = (plan: (typeof plans)[number]) => {
-    if (checkingPlan) {
-      return (
-        <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
-          Checking your plan...
-        </Button>
-      );
-    }
-
-    if (!userId) {
+  const proCta = (item: (typeof plans)[number]) => {
+    if (!signedIn) {
       return (
         <Link
           href="/sign-in?redirectTo=/pricing"
@@ -153,15 +117,15 @@ export default function PricingPlans() {
       );
     }
 
-    if (role !== plan.role) {
+    if (role !== item.role) {
       return (
         <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
-          Available to {plan.role}s only
+          Available to {item.role}s only
         </Button>
       );
     }
 
-    if (profile?.plan === "pro") {
+    if (plan === "pro") {
       return (
         <Button disabled className="mt-6 w-full rounded-xl py-3 text-xs font-bold">
           Current Plan: Pro
@@ -174,10 +138,10 @@ export default function PricingPlans() {
         type="button"
         variant="secondary"
         disabled={busyPlan !== null}
-        onClick={() => handleCheckout(plan.planId)}
+        onClick={() => handleCheckout(item.planId)}
         className="mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold"
       >
-        {busyPlan === plan.planId ? "Opening Stripe..." : "Subscribe with Stripe"}
+        {busyPlan === item.planId ? "Opening Stripe..." : "Subscribe with Stripe"}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Button>
     );
@@ -253,7 +217,7 @@ export default function PricingPlans() {
                   </ul>
                 </div>
                 <Link
-                  href={userId ? "/dashboard" : "/sign-up"}
+                  href={signedIn ? "/dashboard" : "/sign-up"}
                   className={buttonVariants({
                     variant: "outline",
                     className: "mt-6 w-full rounded-xl py-3 text-xs font-bold",

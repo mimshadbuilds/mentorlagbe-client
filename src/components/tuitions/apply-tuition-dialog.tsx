@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
+import { submitApplication } from "@/lib/actions/application";
 import type { UserRole } from "@/components/layout/AuthUser";
 import type { ITuition } from "@/lib/actions/tuition-query";
 import { Button } from "@/components/ui/button";
@@ -50,15 +51,28 @@ export default function ApplyTuitionDialog({ tuition }: { tuition: ITuition }) {
 
     setSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    const scheduleLabel =
+      scheduleOptions.find((option) => option.value === schedule)?.label ?? schedule;
 
-    setSubmitting(false);
-    setApplied(true);
-    setOpen(false);
-    
-    toast.success("Application submitted!", {
-      description: "The tutor will review it shortly.",
-    });
+    try {
+      await submitApplication({
+        tuitionId: tuition._id,
+        preferredSchedule: scheduleLabel,
+        studentNote: notes.trim(),
+      });
+
+      setApplied(true);
+      setOpen(false);
+      toast.success("Application submitted!", {
+        description: "The tutor will review it shortly.",
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit your application."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (applied) {

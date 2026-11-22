@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -13,21 +13,45 @@ import {
   Send,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import StatCard from "@/components/dashboard/shared/StatCard";
-import { FREE_POST_LIMIT, getApplicantStats, tutorApplicants } from "@/lib/data/tutor";
-import { tutorStore } from "@/lib/data/tutor-store";
+import { FREE_POST_LIMIT } from "@/lib/data/tutor";
+import { startCheckout } from "@/lib/actions/payment";
+import type { ITuition } from "@/lib/actions/tuition-query";
+import type { IApplication } from "@/lib/types/application";
+import type { TUserPlan } from "@/lib/types/payment";
 
-export default function TutorOverview() {
-  // Same client-side store as the form/CRUD pages, so the slot count stays
-  // consistent after publishing a new tuition.
-  const owned = useSyncExternalStore(
-    tutorStore.subscribe,
-    tutorStore.getSnapshot,
-    tutorStore.getServerSnapshot
-  );
-  const active = owned.filter((tuition) => tuition.isActive).length;
-  const applicants = getApplicantStats(tutorApplicants);
-  const slotsLeft = Math.max(0, FREE_POST_LIMIT - owned.length);
+type TutorOverviewProps = {
+  tuitions: ITuition[];
+  applications: IApplication[];
+  plan: TUserPlan;
+};
+
+export default function TutorOverview({
+  tuitions,
+  applications,
+  plan,
+}: TutorOverviewProps) {
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const active = tuitions.filter((tuition) => tuition.isActive).length;
+  const pending = applications.filter((item) => item.status === "pending").length;
+  const accepted = applications.filter((item) => item.status === "accepted").length;
+  const slotsLeft = Math.max(0, FREE_POST_LIMIT - tuitions.length);
+
+  const handleUpgrade = async () => {
+    if (checkoutBusy) return;
+    setCheckoutBusy(true);
+
+    try {
+      await startCheckout("tutor_pro");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not start Stripe checkout."
+      );
+    } finally {
+      setCheckoutBusy(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -72,18 +96,20 @@ export default function TutorOverview() {
       <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Tuition Slots"
-          value={String(owned.length)}
-          footnote="/ 2 max"
+          value={String(tuitions.length)}
+          footnote={plan === "pro" ? "Unlimited with Pro" : "/ 2 max"}
           footnoteClassName="text-outline"
           icon={Folder}
           iconChipClassName="bg-surface-container-low text-primary"
           pill={
-            slotsLeft === 0
-              ? { text: "Limit Reached", className: "bg-destructive/10 text-destructive" }
-              : { text: `${slotsLeft} slot left`, className: "bg-tertiary-fixed text-on-tertiary-fixed-variant" }
+            plan === "pro"
+              ? { text: "Pro", className: "bg-tertiary-fixed text-on-tertiary-fixed-variant" }
+              : slotsLeft === 0
+                ? { text: "Limit Reached", className: "bg-destructive/10 text-destructive" }
+                : { text: `${slotsLeft} slot left`, className: "bg-tertiary-fixed text-on-tertiary-fixed-variant" }
           }
-          progress={(owned.length / FREE_POST_LIMIT) * 100}
-          progressClassName={slotsLeft === 0 ? "bg-destructive" : "bg-secondary"}
+          progress={plan === "pro" ? 100 : (tuitions.length / FREE_POST_LIMIT) * 100}
+          progressClassName={slotsLeft === 0 && plan !== "pro" ? "bg-destructive" : "bg-secondary"}
         />
         <StatCard
           label="Active Circulars"
@@ -99,7 +125,7 @@ export default function TutorOverview() {
         />
         <StatCard
           label="Total Applicants"
-          value={String(applicants.total)}
+          value={String(applications.length)}
           footnote="Pending inquiries"
           footnoteClassName="text-outline"
           icon={Send}
@@ -108,28 +134,42 @@ export default function TutorOverview() {
             text: "Action Required",
             className: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
           }}
-          progress={(applicants.pending / applicants.total) * 100}
+          progress={
+            applications.length === 0 ? 0 : (pending / applications.length) * 100
+          }
           progressClassName="bg-tertiary"
         />
         <StatCard
           label="Tier Status"
           className="bg-primary-container text-on-primary"
           pill={{
-            text: "Free ($0/mo)",
+            text: plan === "pro" ? "Pro Active" : "Free ($0/mo)",
             className: "bg-surface-container-lowest/15 text-white",
           }}
         >
           <div className="mt-1">
             <span className="block text-base font-bold text-white">
-              Tutor Basic
+              {plan === "pro" ? "Tutor Pro" : "Tutor Basic"}
             </span>
-            <Link
-              href="/pricing"
-              className="mt-2 inline-flex items-center gap-1.5 rounded bg-secondary px-2.5 py-1 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057]"
-            >
-              Upgrade to PRO ($15/mo)
-              <ArrowRight className="size-3.5" aria-hidden="true" />
-            </Link>
+            {plan === "pro" ? (
+              <Link
+                href="/pricing"
+                className="mt-2 inline-flex items-center gap-1.5 rounded bg-secondary-container/20 px-2.5 py-1 text-xs font-semibold text-white"
+              >
+                View Pro benefits
+                <ArrowRight className="size-3.5" aria-hidden="true" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled={checkoutBusy}
+                onClick={handleUpgrade}
+                className="mt-2 inline-flex items-center gap-1.5 rounded bg-secondary px-2.5 py-1 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50"
+              >
+                {checkoutBusy ? "Opening Stripe..." : "Upgrade to PRO ($15)"}
+                <ArrowRight className="size-3.5" aria-hidden="true" />
+              </button>
+            )}
           </div>
         </StatCard>
       </div>
@@ -138,19 +178,22 @@ export default function TutorOverview() {
         <div className="flex items-start gap-2">
           <Info className="mt-0.5 size-4 shrink-0 text-secondary" aria-hidden="true" />
           <p className="text-xs leading-relaxed text-on-surface">
-            <span className="font-semibold">Free Plan:</span> {owned.length} of{" "}
-            {FREE_POST_LIMIT} tuition posts used. Upgrade to Pro for unlimited
-            posts and a verified badge.
+            <span className="font-semibold">
+              {plan === "pro" ? "Pro Plan:" : "Free Plan:"}
+            </span>{" "}
+            {plan === "pro"
+              ? "Unlimited tuition posts and a verified educator badge are active."
+              : `${tuitions.length} of ${FREE_POST_LIMIT} tuition posts used. Upgrade to Pro for unlimited posts and a verified badge.`}
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs text-secondary">
           <span className="inline-flex items-center gap-1">
             <Check className="size-3.5" aria-hidden="true" />
-            {applicants.accepted} accepted
+            {accepted} accepted
           </span>
           <span className="inline-flex items-center gap-1">
             <Clock3 className="size-3.5" aria-hidden="true" />
-            {applicants.pending} pending
+            {pending} pending
           </span>
         </div>
       </div>

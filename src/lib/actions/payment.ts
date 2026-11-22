@@ -47,7 +47,7 @@ async function paymentFetch<T>(path: string, init?: RequestInit): Promise<T> {
 export const createCheckoutSession = (plan: TProPlan) =>
   paymentFetch<ICheckoutSessionResponse>("/payments/checkout", {
     method: "POST",
-    body: JSON.stringify({ plan }),
+    body: JSON.stringify({ planId: plan }),
   });
 
 export const startCheckout = async (plan: TProPlan) => {

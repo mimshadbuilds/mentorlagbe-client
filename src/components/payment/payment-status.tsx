@@ -4,67 +4,91 @@ import {
   ArrowRight,
   Bookmark,
   CircleCheck,
+  Clock3,
   CreditCard,
   Headset,
   Info,
   LockKeyhole,
   ReceiptText,
+  RefreshCw,
   ShieldCheck,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import type { IPaymentStatus } from "@/lib/types/payment";
+
+type PaymentState = "success" | "processing" | "error" | "cancelled";
 
 type PaymentStatusProps = {
-  status: "success" | "cancelled";
-  plan?: string | string[];
-  sessionId?: string | string[];
-};
-
-const first = (value?: string | string[]) =>
-  Array.isArray(value) ? value[0] : value;
-
-const planDetails = (value?: string | string[]) => {
-  const plan = first(value);
-
-  if (plan === "student") {
-    return {
-      name: "Student PRO Tier (Monthly)",
-      amount: "$10.00 USD",
-    };
-  }
-
-  if (plan === "tutor") {
-    return {
-      name: "Tutor PRO Tier (Monthly)",
-      amount: "$15.00 USD",
-    };
-  }
-
-  return {
-    name: "MentorLagbe PRO Tier (Monthly)",
-    amount: "$15.00 / $10.00 USD",
-  };
+  state: PaymentState;
+  message?: string;
+  details?: IPaymentStatus | null;
+  sessionId?: string;
 };
 
 const secondaryLink =
   "inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary";
 
+function formatAmount(details?: IPaymentStatus | null) {
+  const currency = (details?.currency || "usd").toUpperCase();
+  const raw = typeof details?.amount === "number" ? details.amount : 0;
+  const amount = raw > 100 ? raw / 100 : raw;
+
+  return `${new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)} ${currency}`;
+}
+
+function formatDate(value?: string) {
+  if (!value) return "Awaiting confirmation";
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? "Awaiting confirmation"
+    : date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+}
+
 export default function PaymentStatus({
-  status,
-  plan,
+  state,
+  message,
+  details,
   sessionId,
 }: PaymentStatusProps) {
-  const success = status === "success";
-  const details = planDetails(plan);
-  const reference = first(sessionId);
-
+  const success = state === "success";
+  const cancelled = state === "cancelled";
+  const processing = state === "processing";
   const accent = success
     ? "h-1.5 w-full bg-gradient-to-r from-primary-container via-secondary to-secondary-container"
-    : "h-1.5 w-full bg-gradient-to-r from-tertiary-fixed-dim via-secondary to-primary-container";
+    : cancelled
+      ? "h-1.5 w-full bg-gradient-to-r from-tertiary-fixed-dim via-secondary to-primary-container"
+      : "h-1.5 w-full bg-gradient-to-r from-surface-variant via-secondary to-primary-container";
+
+  const headline = success
+    ? "Payment Successful!"
+    : processing
+      ? "Confirming Your Payment"
+      : cancelled
+        ? "Payment Cancelled"
+        : "Payment Not Confirmed";
+
+  const copy = success
+    ? "Your MentorLagbe Pro subscription is now active. A confirmation receipt has been sent to your email."
+    : processing
+      ? message ||
+        "Stripe is finalizing your checkout. We are verifying the payment with our server — this usually takes a moment."
+      : cancelled
+        ? "Your Stripe checkout session was cancelled and no charges were made. Pro has not been activated by this attempt."
+        : message ||
+          "We could not verify this payment yet. No plan changes were made — please retry or contact support.";
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-surface px-4 py-12">
       <div className="mb-space-lg inline-flex max-w-full items-center gap-2 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-semibold text-on-secondary-container shadow-sm">
-        {success ? (
+        {processing ? (
           <span className="size-2 shrink-0 animate-pulse rounded-full bg-secondary" />
         ) : (
           <ShieldCheck className="size-4 shrink-0 text-secondary" aria-hidden="true" />
@@ -72,7 +96,11 @@ export default function PaymentStatus({
         <span className="truncate">
           {success
             ? "Stripe 256-Bit TLS Secured Transaction"
-            : "Stripe Secure Gateway · Session Terminated Safely"}
+            : processing
+              ? "Verifying with MentorLagbe Server"
+              : cancelled
+                ? "Stripe Secure Gateway · Session Terminated Safely"
+                : "Stripe Secure Gateway · Verification Required"}
         </span>
       </div>
 
@@ -89,7 +117,11 @@ export default function PaymentStatus({
                   <CircleCheck className="size-6" aria-hidden="true" />
                 </span>
               </>
-            ) : (
+            ) : processing ? (
+              <span className="flex size-16 items-center justify-center rounded-full bg-secondary-container/40 text-secondary shadow-inner">
+                <Clock3 className="size-8 animate-pulse" aria-hidden="true" />
+              </span>
+            ) : cancelled ? (
               <>
                 <span className="flex size-20 items-center justify-center rounded-full bg-surface-container shadow-inner">
                   <span className="flex size-14 items-center justify-center rounded-full bg-tertiary-fixed/40 text-tertiary">
@@ -100,20 +132,21 @@ export default function PaymentStatus({
                   <Info className="size-3.5" aria-hidden="true" />
                 </span>
               </>
+            ) : (
+              <span className="flex size-16 items-center justify-center rounded-full bg-surface-container text-outline shadow-inner">
+                <Info className="size-8" aria-hidden="true" />
+              </span>
             )}
           </div>
 
           <h1 className="text-center font-manrope text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-            {success ? "Payment Successful!" : "Payment Cancelled"}
+            {headline}
           </h1>
-
           <p className="mt-space-xs max-w-sm text-center text-sm leading-relaxed text-on-surface-variant">
-            {success
-              ? "Your MentorLagbe Pro subscription is now active. A confirmation receipt has been sent to your email."
-              : "Your Stripe checkout session was cancelled and no charges were made. Your account remains completely active on the Free Tier ($0/mo)."}
+            {copy}
           </p>
 
-          {success ? (
+          {success && (
             <>
               <div className="mt-space-lg w-full rounded-lg bg-surface-container-low p-space-md shadow-sm">
                 <div className="mb-space-sm flex items-center justify-between gap-2 border-b border-surface-container-high pb-space-sm">
@@ -129,20 +162,24 @@ export default function PaymentStatus({
                 <dl className="space-y-1 text-[13px]">
                   <div className="flex items-center justify-between gap-3 py-1">
                     <dt className="text-on-surface-variant">Subscribed Plan</dt>
-                    <dd className="text-right font-bold text-primary">{details.name}</dd>
+                    <dd className="text-right font-bold text-primary">
+                      {details?.planName ?? "MentorLagbe Pro"}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between gap-3 py-1">
                     <dt className="text-on-surface-variant">Amount Paid</dt>
-                    <dd className="font-bold text-secondary">{details.amount}</dd>
+                    <dd className="font-bold text-secondary">{formatAmount(details)}</dd>
                   </div>
                   <div className="flex items-center justify-between gap-3 py-1">
-                    <dt className="text-on-surface-variant">Billing Cycle</dt>
-                    <dd className="text-right text-on-surface">Renews monthly</dd>
+                    <dt className="text-on-surface-variant">Payment Date</dt>
+                    <dd className="text-right text-on-surface">
+                      {formatDate(details?.paidAt)}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between gap-3 pt-1">
                     <dt className="text-on-surface-variant">Transaction Ref</dt>
                     <dd className="max-w-[65%] break-all rounded bg-surface-container px-2 py-0.5 text-right font-mono text-[11px] text-on-surface-variant">
-                      {reference ? `${reference} · Stripe` : "Awaiting Stripe confirmation"}
+                      {details?.transactionId ?? sessionId ?? "Stripe"}
                     </dd>
                   </div>
                 </dl>
@@ -188,7 +225,51 @@ export default function PaymentStatus({
                 </Link>
               </div>
             </>
-          ) : (
+          )}
+
+          {(processing || state === "error") && (
+            <>
+              <div className="mt-space-lg w-full rounded-lg bg-surface-container-low p-space-md text-left text-[13px] text-on-surface-variant">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Stripe Session</span>
+                  <span className="max-w-[65%] break-all rounded bg-surface-container px-2 py-0.5 text-right font-mono text-[11px] text-on-surface">
+                    {sessionId ?? "Not provided"}
+                  </span>
+                </div>
+                {details?.planName && (
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <span>Plan in checkout</span>
+                    <span className="font-semibold text-primary">
+                      {details.planName}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <a
+                href={
+                  sessionId
+                    ? `/payment/success?session_id=${encodeURIComponent(sessionId)}`
+                    : "/payment/success"
+                }
+                className={buttonVariants({
+                  variant: "secondary",
+                  className:
+                    "mt-space-lg w-full gap-2 rounded-lg py-3 text-sm font-bold",
+                })}
+              >
+                <RefreshCw className="size-4" aria-hidden="true" />
+                Check Payment Status Again
+              </a>
+              <div className="mt-space-sm w-full text-center">
+                <Link href="/pricing" className={secondaryLink}>
+                  Review Plans
+                </Link>
+              </div>
+            </>
+          )}
+
+          {cancelled && (
             <>
               <div className="mt-space-lg w-full space-y-space-md rounded-lg bg-surface-container-low p-space-md text-left">
                 <div className="flex items-start gap-space-sm">
@@ -262,7 +343,7 @@ export default function PaymentStatus({
               <div className="mt-space-md w-full text-center">
                 <Link href="/tuitions" className={secondaryLink}>
                   <ArrowLeft className="size-4" aria-hidden="true" />
-                  Return directly to your Dashboard
+                  Continue browsing tuitions
                 </Link>
               </div>
             </>
@@ -270,29 +351,16 @@ export default function PaymentStatus({
         </div>
 
         <div className="bg-surface-container-low px-space-lg py-3 text-center text-[13px] text-on-surface-variant">
-          {success ? (
-            <p>
-              Questions regarding this charge?{" "}
-              <a
-                href="mailto:billing@mentorlagbe.com"
-                className="font-semibold text-secondary hover:underline"
-              >
-                billing@mentorlagbe.com
-              </a>
-            </p>
-          ) : (
-            <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-              <Headset className="size-4 text-outline" aria-hidden="true" />
-              Having trouble with payment authorization?
-              <a
-                href="mailto:billing@mentorlagbe.com"
-                className="font-semibold text-secondary hover:underline"
-              >
-                billing@mentorlagbe.com
-              </a>
-              <span className="hidden sm:inline">· Hotline: 16443 (9 AM – 9 PM)</span>
-            </p>
-          )}
+          <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <Headset className="size-4 text-outline" aria-hidden="true" />
+            Payment questions?
+            <a
+              href="mailto:billing@mentorlagbe.com"
+              className="font-semibold text-secondary hover:underline"
+            >
+              billing@mentorlagbe.com
+            </a>
+          </p>
         </div>
       </div>
 
@@ -300,9 +368,9 @@ export default function PaymentStatus({
         <LockKeyhole className="size-3.5" aria-hidden="true" />
         {success ? "PCI-DSS Level 1 Compliant" : "256-Bit SSL Encrypted"}
         <span aria-hidden="true">•</span>
-        {success
-          ? "Auto-renewal can be modified anytime in Account Settings"
-          : "MentorLagbe Guarantee"}
+        {cancelled
+          ? "MentorLagbe Guarantee"
+          : "Auto-renewal can be modified anytime in Account Settings"}
       </p>
     </div>
   );

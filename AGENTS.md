@@ -66,7 +66,9 @@ src/lib/data/              seed datasets (tuitions, applications, tutor) + types
 | Tutor my-tuitions CRUD + toggle | **API** (`tutor-query.ts` → GET /tuitions/my with server JWT; `updateTuition`, `deleteTuition`, `setTuitionActive` in `actions/tution.ts` with client JWT) |
 | Admin overview, users, moderation, transactions | **API** (`admin-query.ts` reads, `admin.ts` writes) — backend endpoints listed under Completed phases |
 | Profile `/dashboard/profile` | **Better Auth** (`authClient.updateUser`); `phone`/`bio` are user `additionalFields` in `auth.ts` — no backend endpoint needed |
-| Student dashboard applications, tutor overview/applicants, saved tuitions | Seed/client-side (`lib/data/*`, localStorage store) — `TODO(backend)` markers mark every swap point |
+| Student/tutor applications + dashboards | **API** (`application-query.ts` reads GET /applications/student|tutor with server JWT; `application.ts` writes POST/PATCH/DELETE with client JWT) |
+| Stripe checkout/status + current plan | **API** (`payment.ts` client: POST /payments/checkout, GET /payments/status?session_id=…, GET /users/me; `payment-query.ts` server mirrors) |
+| Saved tuitions | Seed/client-side (`lib/data/*`, localStorage store) — `TODO(backend)` markers mark every swap point |
 | Homepage featured tuitions | Local component data |
 
 `tuition-query.ts` returns raw backend docs (`_id`, `Online/Offline`, numeric
@@ -112,16 +114,27 @@ token from `authHeader()` 401s against backend `verifyToken`.
   `GET /tuitions/my` server-side (`tutor-query.ts`) and writes via PATCH/PATCH
   status/DELETE in `actions/tution.ts`; `router.refresh()` re-reads after each
   write. UI, filters, dialogs and responsiveness unchanged; seed/localStorage
-  store stays for the other dashboard surfaces. Applicant counts still come
-  from the seed until Phase C. Verified by `check-my-tuitions.ps1` (14/14) and
-  `check-tutor-crud.ps1` (5/5).
-- **Pricing + payment status pages (gap-fill)** `/pricing` (Free vs Pro for both
-  roles, $15/$10) and `/payment/success`, `/payment/cancel` (design clones from
-  the stitch folders). `startCheckout` in `actions/payment.ts` POSTs
-  `{plan:"pro", role}` to backend `POST /payments/checkout` and redirects to its
-  `url` — backend not built yet, so the CTA toasts a clear error until then.
-  `searchParams` reads sit behind `<Suspense>` (Next 16 otherwise fails build).
-  Verified by `check-pricing-payment.ps1` (19/19).
+  store stays for saved tuitions. Applicant counts now come from the API.
+  Verified by `check-my-tuitions.ps1` (14/14) and `check-tutor-crud.ps1` (5/5).
+- **Phase C (Tutor applicants)** `/dashboard/tutor/applicants` reads
+  GET /applications/tutor server-side; accept/reject PATCHes
+  /applications/:id/status (only pending rows show actions). Tutor overview and
+  my-tuitions applicant counts use the same real data.
+- **Phase D (Student applications)** Apply dialog POSTs /applications (duplicate
+  409 → error toast), my-applications reads GET /applications/student and cancels
+  via DELETE /applications/:id (pending only); student overview stats are API-fed.
+  Verified by `check-applications-api.ps1` (18/18).
+- **Stripe frontend (gap-fill + F1–F8)** `/pricing` is server-resolved by role and
+  plan: matching role gets "Subscribe with Stripe" (`tutor_pro` / `student_pro`),
+  other roles/admins get a disabled CTA, guests get `/sign-in?redirectTo=/pricing`.
+  `startCheckout` POSTs `{planId}` (`tutor_pro` / `student_pro`) to
+  `/payments/checkout` and redirects to `checkoutUrl || url`. Dashboard upgrade
+  buttons use the same action. Success
+  page verifies `GET /payments/status?session_id=…` server-side and shows
+  confirmed / processing / error states; the URL alone never grants Pro. Cancel
+  page never shows a receipt. Admin table uses per-record currency and
+  paymentStatus. Verified by `check-stripe-frontend.ps1` (17/17) and
+  `check-pricing-payment.ps1` (19/19).
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,
@@ -163,6 +176,11 @@ token from `authHeader()` 401s against backend `verifyToken`.
   operator captures nothing). Probe route must not start with `_` (private
   folder → no route); checker uses a temp `src/app/error-probe/page.tsx`,
   added and removed around the run.
+- `middleware.ts` is deprecated in Next 16 — `src/proxy.ts` is the route guard.
+  Its matcher is a build-time constant: `["/dashboard/:path*"]` covers `/dashboard`
+  and every private nested route (profile included), leaving public site/payment
+  pages alone. Guests get `307 /sign-in?redirectTo=<original path+query>`; the
+  sign-in form uses that value as `callbackURL`. Authenticated reloads stay 200.
 
 ## Conventions
 

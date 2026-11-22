@@ -43,3 +43,46 @@ const res = await fetch(`${baseURL}/tuitions`, {
 
     return data;
 };
+
+async function tuitionRequest(
+    method: "PATCH" | "DELETE",
+    path: string,
+    body: object | undefined,
+    fallback: string
+) {
+    const token = await getClientToken();
+
+    if (!token) {
+        throw new Error("Authentication required. Please sign in again.");
+    }
+
+    const res = await fetch(`${baseURL}${path}`, {
+        method,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+        throw new Error(data.message || fallback);
+    }
+
+    return data;
+}
+
+export const updateTuition = (id: string, payload: ICreateTuitionPayload) =>
+    tuitionRequest("PATCH", `/tuitions/${id}`, payload, "Failed to update tuition.");
+
+export const deleteTuition = (id: string) =>
+    tuitionRequest("DELETE", `/tuitions/${id}`, undefined, "Failed to delete tuition.");
+
+export const setTuitionActive = (id: string, isActive: boolean) =>
+    tuitionRequest(
+        "PATCH",
+        `/tuitions/${id}/status`,
+        { isActive },
+        "Failed to update tuition status."
+    );

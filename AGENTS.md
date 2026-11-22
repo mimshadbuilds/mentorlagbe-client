@@ -63,9 +63,10 @@ src/lib/data/              seed datasets (tuitions, applications, tutor) + types
 |---|---|
 | Browse `/tuitions`, details `/tuitions/[id]` | **API** (`tuition-query.ts` → GET /tuitions, /tuitions/:id), raw backend `ITuition` shape (no mapper) |
 | Tutor post submission | **API** (`createTuition` in `actions/tution.ts`) |
+| Tutor my-tuitions CRUD + toggle | **API** (`tutor-query.ts` → GET /tuitions/my with server JWT; `updateTuition`, `deleteTuition`, `setTuitionActive` in `actions/tution.ts` with client JWT) |
 | Admin overview, users, moderation, transactions | **API** (`admin-query.ts` reads, `admin.ts` writes) — backend endpoints listed under Completed phases |
 | Profile `/dashboard/profile` | **Better Auth** (`authClient.updateUser`); `phone`/`bio` are user `additionalFields` in `auth.ts` — no backend endpoint needed |
-| Student dashboard applications, tutor dashboard (posts/applicants), saved tuitions | Seed/client-side (`lib/data/*`, localStorage store) — `TODO(backend)` markers mark every swap point |
+| Student dashboard applications, tutor overview/applicants, saved tuitions | Seed/client-side (`lib/data/*`, localStorage store) — `TODO(backend)` markers mark every swap point |
 | Homepage featured tuitions | Local component data |
 
 `tuition-query.ts` returns raw backend docs (`_id`, `Online/Offline`, numeric
@@ -107,6 +108,13 @@ token from `authHeader()` 401s against backend `verifyToken`.
   used by root `error.tsx` (`{error, retry}` per Next 16) and `global-error.tsx`
   (own html/body + globals.css). Notes items 36–38 park the substitutions.
   Verified by `check-404-error.ps1` (31/31) — see gotchas below.
+- **Phase B (My Tuitions API swap)** `/dashboard/tutor/my-tuitions` now reads
+  `GET /tuitions/my` server-side (`tutor-query.ts`) and writes via PATCH/PATCH
+  status/DELETE in `actions/tution.ts`; `router.refresh()` re-reads after each
+  write. UI, filters, dialogs and responsiveness unchanged; seed/localStorage
+  store stays for the other dashboard surfaces. Applicant counts still come
+  from the seed until Phase C. Verified by `check-my-tuitions.ps1` (14/14) and
+  `check-tutor-crud.ps1` (5/5).
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

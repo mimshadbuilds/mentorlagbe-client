@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   BadgeCheck,
@@ -41,8 +42,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { tutorApplicants } from "@/lib/data/tutor";
-import { saveTutorTuitions, tutorStore } from "@/lib/data/tutor-store";
-import type { TuitionRecord } from "@/lib/data/tuitions";
+import {
+  deleteTuition,
+  setTuitionActive,
+  updateTuition,
+} from "@/lib/actions/tution";
+import type { ITuition } from "@/lib/actions/tuition-query";
 
 type StatusFilter = "all" | "approved" | "pending" | "closed" | "rejected";
 
@@ -54,13 +59,8 @@ const filters: { key: StatusFilter; label: string }[] = [
   { key: "rejected", label: "Rejected" },
 ];
 
-export default function MyTuitions() {
-  // SSR renders the seeded list; the browser swaps in the persisted store.
-  const tuitions = useSyncExternalStore(
-    tutorStore.subscribe,
-    tutorStore.getSnapshot,
-    tutorStore.getServerSnapshot
-  );
+export default function MyTuitions({ tuitions }: { tuitions: ITuition[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -96,60 +96,75 @@ export default function MyTuitions() {
     [tuitions, filter, query]
   );
 
-  const persist = (next: TuitionRecord[]) => {
-    saveTutorTuitions(next);
+  const showError = (error: unknown, fallback: string) =>
+    toast.error(error instanceof Error ? error.message : fallback);
+
+  const toggleActive = async (id: string, isActive: boolean) => {
+    try {
+      await setTuitionActive(id, isActive);
+      toast.success(isActive ? "Tuition activated" : "Tuition closed");
+      router.refresh();
+    } catch (error) {
+      showError(error, "Failed to update tuition status.");
+    }
   };
 
-  const toggleActive = (id: string, isActive: boolean) => {
-    // TODO(backend): PATCH mentorlagbe-server /tuitions/:id
-    persist(
-      tuitions.map((tuition) =>
-        tuition.id === id ? { ...tuition, isActive } : tuition
-      )
-    );
-    toast.success(isActive ? "Tuition activated" : "Tuition closed");
-  };
-
-  const openEdit = (tuition: TuitionRecord) => {
-    setEditingId(tuition.id ?? null);
+  const openEdit = (tuition: ITuition) => {
+    setEditingId(tuition._id);
     setEditForm({
       title: tuition.title,
       monthlyFee: String(tuition.monthlyFee),
-      daysPerWeek: tuition.daysPerWeek,
+      daysPerWeek: String(tuition.daysPerWeek),
       description: tuition.description,
     });
   };
 
-  const handleEdit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleEdit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!editingId) return;
-    // TODO(backend): PUT mentorlagbe-server /tuitions/:id
-    persist(
-      tuitions.map((tuition) =>
-        tuition.id === editingId
-          ? {
-              ...tuition,
-              title: editForm.title.trim(),
-              monthlyFee: Number(editForm.monthlyFee),
-              daysPerWeek: editForm.daysPerWeek,
-              description: editForm.description.trim(),
-            }
-          : tuition
-      )
-    );
-    toast.success("Tuition updated");
-    setEditingId(null);
+    const editingTuition = tuitions.find((t) => t._id === editingId);
+    if (!editingTuition) return;
+
+    const changes = {
+      title: editForm.title.trim(),
+      monthlyFee: Number(editForm.monthlyFee),
+      daysPerWeek: Number(editForm.daysPerWeek),
+      description: editForm.description.trim(),
+    };
+
+    try {
+      await updateTuition(editingTuition._id, {
+        title: changes.title,
+        subject: editingTuition.subject,
+        classLevel: editingTuition.classLevel,
+        mode: editingTuition.mode,
+        location: editingTuition.location,
+        monthlyFee: changes.monthlyFee,
+        daysPerWeek: changes.daysPerWeek,
+        bannerImage: editingTuition.bannerImage,
+        description: changes.description,
+      });
+      toast.success("Tuition updated");
+      setEditingId(null);
+      router.refresh();
+    } catch (error) {
+      showError(error, "Failed to update tuition.");
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deletingId) return;
-    // TODO(backend): DELETE mentorlagbe-server /tuitions/:id
-    persist(tuitions.filter((tuition) => tuition.id !== deletingId));
-    toast.success("Tuition deleted");
-    setDeletingId(null);
+
+    try {
+      await deleteTuition(deletingId);
+      toast.success("Tuition deleted");
+      setDeletingId(null);
+      router.refresh();
+    } catch (error) {
+      showError(error, "Failed to delete tuition.");
+    }
   };
 
-  const editing = tuitions.find((tuition) => tuition.id === editingId);
+  const editing = tuitions.find((tuition) => tuition._id === editingId);
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -237,13 +252,13 @@ export default function MyTuitions() {
         ) : (
           visible.map((tuition) => {
             const applicantCount = tutorApplicants.filter(
-              (applicant) => applicant.tuitionId === tuition.id
+              (applicant) => applicant.tuitionId === tuition._id
             ).length;
             const approved = tuition.approvalStatus === "approved";
 
             return (
               <article
-                key={tuition.id}
+                key={tuition._id}
                 className="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest p-space-lg shadow-sm transition-all hover:shadow-md"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -285,10 +300,10 @@ export default function MyTuitions() {
                       />
                       {tuition.isActive ? "Active Listing" : "Closed"}
                     </span>
-                    <span className="text-xs text-outline">Ref: #{tuition.id}</span>
+                    <span className="text-xs text-outline">Ref: #{tuition._id}</span>
                   </div>
                   <span className="text-xs text-outline">
-                    Posted {new Date(`${tuition.postedAt}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    Posted {new Date(tuition.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </span>
                 </div>
 
@@ -303,11 +318,11 @@ export default function MyTuitions() {
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-surface-container-low px-2.5 py-0.5 text-xs text-on-surface">
                         <MapPin className="size-3.5 text-outline" aria-hidden="true" />
-                        {tuition.mode === "online" ? "Online" : tuition.location}
+                        {tuition.mode === "Online" ? "Online" : tuition.location}
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-surface-container-low px-2.5 py-0.5 text-xs text-on-surface">
                         <CalendarDays className="size-3.5 text-outline" aria-hidden="true" />
-                        {tuition.daysPerWeek}
+                        {tuition.daysPerWeek} days / week
                       </span>
                     </div>
                   </div>
@@ -340,7 +355,7 @@ export default function MyTuitions() {
                       <Switch
                         checked={tuition.isActive}
                         onCheckedChange={(checked: boolean) =>
-                          toggleActive(tuition.id ?? "", checked)
+                          toggleActive(tuition._id ?? "", checked)
                         }
                         aria-label="Toggle tuition visibility"
                       />
@@ -366,7 +381,7 @@ export default function MyTuitions() {
                         type="button"
                         title="Delete tuition"
                         aria-label={`Delete ${tuition.title}`}
-                        onClick={() => setDeletingId(tuition.id ?? null)}
+                        onClick={() => setDeletingId(tuition._id ?? null)}
                         className="rounded-lg p-2 text-outline transition-colors hover:bg-destructive/10 hover:text-destructive"
                       >
                         <Trash className="size-4" aria-hidden="true" />
@@ -426,6 +441,9 @@ export default function MyTuitions() {
                 <Label htmlFor="edit-days" className="text-xs">Days per Week</Label>
                 <Input
                   id="edit-days"
+                  type="number"
+                  min={1}
+                  max={7}
                   required
                   value={editForm.daysPerWeek}
                   onChange={(event) =>
@@ -474,7 +492,7 @@ export default function MyTuitions() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <p className="rounded-lg bg-surface-container-low p-3 text-xs font-semibold text-on-surface">
-            {editing?.title ?? tuitions.find((t) => t.id === deletingId)?.title}
+            {editing?.title ?? tuitions.find((t) => t._id === deletingId)?.title}
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel>Keep Tuition</AlertDialogCancel>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import TuitionsCard from "@/components/layout/TuitionsCard";
 import { getTuitions } from "@/lib/actions/tuition-query";
@@ -10,6 +11,7 @@ export default async function FeaturedTuitions() {
     try {
         tuitions = await getTuitions();
     } catch (error) {
+        unstable_rethrow(error);
         console.error("Featured tuitions request failed:", error);
 
         return (

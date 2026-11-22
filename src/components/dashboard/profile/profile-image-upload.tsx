@@ -49,6 +49,7 @@ export default function ProfileImageUpload({ name, image, onImageChange, disable
     try {
         const result = await uploadProfileImage(file);
         onImageChange(result.imageUrl);
+        setPreview(null);
         toast.success("Profile picture uploaded successfully.");
     } catch (error) {
         setPreview(null);

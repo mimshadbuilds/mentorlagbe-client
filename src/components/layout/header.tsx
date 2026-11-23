@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   Moon,
-  Search,
   Sun,
   UserRound,
 } from "lucide-react";

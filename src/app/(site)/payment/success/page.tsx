@@ -5,6 +5,8 @@ import { getPaymentStatusServer } from "@/lib/actions/payment-query";
 
 export const metadata: Metadata = {
   title: "Payment Successful | MentorLagbe",
+  description:
+    "Check the verification status of your MentorLagbe payment and subscription.",
 };
 
 type SearchParams = {

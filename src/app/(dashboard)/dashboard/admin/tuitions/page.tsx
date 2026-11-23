@@ -1,7 +1,14 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import ModerationList from "@/components/dashboard/admin/moderation-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAdminTuitions } from "@/lib/actions/admin-query";
+
+export const metadata: Metadata = {
+  title: "Tuition Moderation | MentorLagbe",
+  description:
+    "Review and moderate tuition listings submitted to the MentorLagbe marketplace.",
+};
 
 export default function AdminTuitionsPage() {
   return (

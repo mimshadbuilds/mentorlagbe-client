@@ -10,11 +10,38 @@ if (!mongoUri) {
 
 type MongoGlobal = typeof globalThis & {
     mentorlagbeMongoClient?: MongoClient
+    mentorlagbeMongoDiagnosticsAttached?: boolean
 }
 
 const globalForMongo = globalThis as MongoGlobal
 const client = globalForMongo.mentorlagbeMongoClient ?? new MongoClient(mongoUri)
 globalForMongo.mentorlagbeMongoClient = client
+
+if (!globalForMongo.mentorlagbeMongoDiagnosticsAttached) {
+    const runtimeContext = {
+        pid: process.pid,
+        region: process.env.VERCEL_REGION ?? "local",
+        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
+    }
+
+    client.on("close", () => {
+        console.error("[MongoDB diagnostics] MongoClient close event", {
+            ...runtimeContext,
+            occurredAt: new Date().toISOString(),
+        })
+    })
+
+    client.on("topologyClosed", (event) => {
+        console.error("[MongoDB diagnostics] MongoDB topologyClosed event", {
+            ...runtimeContext,
+            topologyId: event.topologyId,
+            occurredAt: new Date().toISOString(),
+        })
+    })
+
+    globalForMongo.mentorlagbeMongoDiagnosticsAttached = true
+}
+
 const db = client.db('mentorlagbeDB')
 
 export const auth = betterAuth({

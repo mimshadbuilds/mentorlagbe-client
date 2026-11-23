@@ -8,8 +8,10 @@
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Shadcn UI](https://img.shields.io/badge/shadcn%2Fui-Latest-000000?style=for-the-badge&logo=shadcnui&logoColor=white)](https://ui.shadcn.com/)
 [![BetterAuth](https://img.shields.io/badge/BetterAuth-Latest-10B981?style=for-the-badge)](https://better-auth.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Express.js](https://img.shields.io/badge/Express.js-Backend-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 
 </div>
 
@@ -66,8 +68,8 @@ The application includes responsive navigation, mobile sidebars, skeleton loadin
 | [Shadcn UI](https://ui.shadcn.com/) | Accessible, composable interface components |
 | [Better Auth](https://better-auth.com/) | Authentication and JWT session handling |
 | [MongoDB](https://www.mongodb.com/) | User and application data storage |
+| [Express.js](https://expressjs.com/) | REST API backend for application services |
 | [Stripe](https://stripe.com/) | Premium plan checkout and payment status |
-| REST API | Tuition, application, admin, payment, and upload integration |
 
 ---
 

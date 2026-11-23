@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 🎓 MentorLagbe
 
-First, run the development server:
+**Find the right tutor, manage tuition listings, and connect students with teachers.**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![BetterAuth](https://img.shields.io/badge/BetterAuth-Latest-10B981?style=for-the-badge)](https://better-auth.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+</div>
+
+---
+
+## 📖 What is MentorLagbe?
+
+MentorLagbe is a tuition marketplace that helps students discover tutors and tuition batches while giving tutors tools to publish listings, manage applications, and grow their profile.
+
+The platform supports role-based dashboards for **students, tutors, and administrators**, plus authentication, tuition filtering, saved listings, applications, profile management, and Stripe checkout for premium plans.
+
+---
+
+## Key Features
+
+### 1. 🔍 Tuition Discovery
+
+Browse tuition listings with search and filters for subject, class level, location, and teaching mode. Open individual listings to view schedule, fee, tutor information, and full descriptions.
+
+### 2. 🎓 Student Features
+
+Students can save tuition listings, apply with their preferred schedule, track application statuses, cancel pending applications, and manage their profile.
+
+### 3. 🧑‍🏫 Tutor Features
+
+Tutors can post tuition batches, upload banners, edit or delete listings, activate or deactivate posts, review applicants, and accept or reject applications.
+
+### 4. 🛡️ Admin Dashboard
+
+Administrators can review platform statistics, manage users and roles, moderate tuition approvals, and view transaction records.
+
+### 5. 💳 Plans and Payments
+
+The pricing experience includes starter and PRO plans. Signed-in users can begin Stripe checkout and see payment success or cancellation states.
+
+### 6. 🔐 Secure Authentication
+
+Email/password authentication and Google sign-in are powered by Better Auth. Sessions use JWT-backed cookies and role information is stored for student, tutor, and admin access control.
+
+### 7. 🌙 Responsive Dashboard Experience
+
+The application includes responsive navigation, mobile sidebars, skeleton loading states, dark/light theme support, toast notifications, and role-specific dashboard layouts.
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| [Next.js 16](https://nextjs.org/) | Full-stack React framework with App Router |
+| [React 19](https://react.dev/) | Component-based UI development |
+| [TypeScript](https://www.typescriptlang.org/) | Type-safe application code |
+| [Tailwind CSS v4](https://tailwindcss.com/) | Responsive utility-first styling |
+| [Shadcn UI](https://ui.shadcn.com/) | Accessible, composable interface components |
+| [Better Auth](https://better-auth.com/) | Authentication and JWT session handling |
+| [MongoDB](https://www.mongodb.com/) | User and application data storage |
+| [Stripe](https://stripe.com/) | Premium plan checkout and payment status |
+| REST API | Tuition, application, admin, payment, and upload integration |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 20 or later
+- npm
+- MongoDB connection string
+- A running MentorLagbe backend/API
+- Google OAuth credentials for Google sign-in, if used
+- Stripe configuration for payment flows
+
+### Installation
+
+```bash
+npm install
+```
+
+Create a `.env.local` file in the project root:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+NEXT_PUBLIC_API_URL=http://localhost:5000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+BETTER_AUTH_SECRET=your_secret
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev    # Start the development server
+npm run build  # Create a production build
+npm run start  # Run the production server
+npm run lint   # Run ESLint
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+.
+├── AGENTS.md                    # Repository guidance and working instructions
+├── README.md                    # Project documentation
+├── eslint.config.mjs            # ESLint configuration
+├── next.config.ts               # Next.js configuration
+├── package.json                 # Scripts and dependencies
+├── package-lock.json            # npm lockfile
+├── tsconfig.json                # TypeScript configuration
+├── public/                      # Logos, banners, and static assets
+├── src/
+│   ├── app/                     # Next.js App Router
+│   │   ├── (auth)/              # Sign-in and sign-up pages
+│   │   ├── (dashboard)/         # Role-based dashboard routes
+│   │   │   └── dashboard/
+│   │   │       ├── admin/
+│   │   │       ├── profile/
+│   │   │       ├── student/
+│   │   │       └── tutor/
+│   │   ├── (site)/              # Public pages and payment routes
+│   │   │   ├── tuitions/
+│   │   │   ├── pricing/
+│   │   │   └── payment/
+│   │   ├── api/auth/            # Better Auth route handler
+│   │   ├── layout.tsx
+│   │   ├── globals.css
+│   │   └── not-found.tsx
+│   ├── components/
+│   │   ├── auth/                # Authentication forms
+│   │   ├── dashboard/           # Admin, student, tutor, and profile UI
+│   │   ├── home/                # Landing-page sections
+│   │   ├── layout/              # Header and footer
+│   │   ├── payment/             # Checkout status UI
+│   │   ├── pricing/             # Pricing plans
+│   │   ├── tuitions/            # Listing browse and details UI
+│   │   └── ui/                  # Shared Shadcn-style components
+│   ├── hooks/                   # Mobile, subscription, and client hooks
+│   ├── lib/
+│   │   ├── actions/             # API and server/client mutations
+│   │   ├── core/                # Session helpers
+│   │   ├── data/                # Seeded and local fallback data
+│   │   └── types/               # Shared TypeScript types
+│   └── proxy.ts                 # Dashboard route protection
+└── .gitignore
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -m 'Add YourFeature'`)
+4. Push to your branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📌 License
+
+This project is open source and available under the MIT License.

@@ -41,8 +41,8 @@ export function RoleBadge({ role }: { role: UserRole }) {
 
 export function ProBadge() {
   return (
-    <Badge className="shrink-0 gap-1 bg-tertiary-fixed font-bold tracking-wide text-on-tertiary-fixed-variant uppercase hover:bg-tertiary-fixed">
-      <BadgeCheck className="size-3" aria-hidden="true" />
+    <Badge className="shrink-0 gap-0.5 px-1.5 py-0.5 text-[9px] bg-tertiary-fixed font-bold tracking-wide text-on-tertiary-fixed-variant uppercase hover:bg-tertiary-fixed">
+      <BadgeCheck className="size-1" aria-hidden="true" />
       Pro
     </Badge>
   );
@@ -97,7 +97,7 @@ const AuthUser = () => {
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
-      if (await signOut()) {
+      if(await signOut()) {
         router.replace("/sign-in");
         router.refresh();
       }
@@ -110,8 +110,7 @@ const AuthUser = () => {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account menu"
-        className="flex items-center gap-1.5 rounded-full px-1.5 py-1 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
-      >
+        className="flex items-center gap-1.5 rounded-full px-1.5 py-1 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none">
         <Avatar className="size-8 shrink-0 ring-2 ring-secondary/25">
           <AvatarImage
             src={user.image ?? undefined}
@@ -122,7 +121,6 @@ const AuthUser = () => {
             {(user.name ?? "U").charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        {isPro && <ProBadge />}
         <span className="hidden max-w-32 truncate text-sm font-semibold text-foreground md:block">
           {user.name}
         </span>

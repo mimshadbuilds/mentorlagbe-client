@@ -20,10 +20,7 @@ type StudentOverviewProps = {
   plan: TUserPlan;
 };
 
-export default function StudentOverview({
-  applications,
-  plan,
-}: StudentOverviewProps) {
+export default function StudentOverview({ applications, plan }: StudentOverviewProps) {
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const total = applications.length;
   const pending = applications.filter((item) => item.status === "pending").length;
@@ -105,8 +102,7 @@ export default function StudentOverview({
           pill={{
             text: plan === "pro" ? "Pro" : "Standard",
             className: "bg-surface-container text-primary",
-          }}
-        >
+          }}>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <div>
               <span className="block text-base font-bold text-primary">
@@ -119,8 +115,7 @@ export default function StudentOverview({
             {plan === "pro" ? (
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-1 rounded-lg bg-surface-container px-space-sm py-1.5 text-xs font-semibold text-primary"
-              >
+                className="inline-flex items-center gap-1 rounded-lg bg-surface-container px-space-sm py-1.5 text-xs font-semibold text-primary">
                 View benefits
               </Link>
             ) : (
@@ -128,8 +123,7 @@ export default function StudentOverview({
                 type="button"
                 disabled={checkoutBusy}
                 onClick={handleUpgrade}
-                className="inline-flex items-center gap-1 rounded-lg bg-secondary px-space-sm py-1.5 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50"
-              >
+                className="inline-flex items-center gap-1 rounded-lg bg-secondary px-space-sm py-1.5 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50">
                 {checkoutBusy ? "Opening Stripe..." : "Upgrade to Pro"}
                 <span className="text-[11px] font-bold text-primary-foreground/80">
                   ($10)

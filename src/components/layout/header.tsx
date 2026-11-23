@@ -25,7 +25,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import AuthUser, { RoleBadge, signOut, type UserRole } from "./AuthUser";
+import AuthUser, { ProBadge, RoleBadge, signOut, type UserRole } from "./AuthUser";
+import { useProStatus } from "@/hooks/use-pro-status";
 
 const baseNavLinks = [
   { label: "Home", href: "/" },
@@ -71,6 +72,8 @@ export default function SiteHeader() {
 
   const user = session?.user ?? null;
   const role = user ? (user.role as UserRole) : null;
+  const isPro = useProStatus(user?.id);
+  
 
   const navLinks = user ? [...baseNavLinks, dashboardLink] : baseNavLinks;
 
@@ -111,14 +114,16 @@ export default function SiteHeader() {
               EdTech
             </span>
           )}
+          <span className="size-1 pb-8">
+            {isPro && <ProBadge />}
+          </span>
         </div>
 
         <nav className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center lg:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
-              <Link
-                key={link.href}
+              <Link key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
@@ -140,15 +145,7 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Search tuitions"
-            render={<Link href="/tuitions" />}>
-            <Search />
-          </Button>
           <ThemeToggle />
-
           <span className="ml-1">
             <AuthUser />
           </span>
@@ -257,8 +254,7 @@ export default function SiteHeader() {
                       onClick={() => {
                         setMenuOpen(false);
                         router.push("/sign-in");
-                      }}
-                    >
+                      }}>
                       Sign In
                     </Button>
                     <Button

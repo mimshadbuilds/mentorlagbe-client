@@ -21,8 +21,8 @@ export default function Home() {
                 }>
                 <FeaturedTuitions />
             </Suspense>
-            <HowItWorks />
             <PopularSubjects />
+            <HowItWorks />
             <Statistics />
             <PricingCards />
             <FinalCta />

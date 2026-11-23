@@ -30,9 +30,9 @@ export default async function DashboardChrome({ children }: { children: ReactNod
           role,
         }}
       />
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <DashboardHeader />
-        <div className="flex flex-1 flex-col px-space-md py-space-md sm:px-space-lg sm:py-space-lg lg:px-space-xl lg:py-space-xl">
+        <div className="flex min-w-0 flex-1 flex-col px-space-md py-space-md sm:px-space-lg sm:py-space-lg lg:px-space-xl lg:py-space-xl">
           {children}
         </div>
       </SidebarInset>

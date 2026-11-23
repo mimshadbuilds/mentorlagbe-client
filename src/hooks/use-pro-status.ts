@@ -8,7 +8,7 @@ export function useProStatus(userId?: string) {
     null
   );
 
-  useEffect(() => {
+useEffect(() => {
     if (!userId) return;
 
     let active = true;

@@ -140,9 +140,17 @@ token from `authHeader()` 401s against backend `verifyToken`.
   badge is rendered in both the site and dashboard headers from `GET /users/me`
   (`useProStatus`); verified in-browser with a Pro student. Saved tuitions is
   implemented with a per-user localStorage store: free students get 5 bookmarks,
-  Pro gets unlimited; details-page bookmark button and dashboard list share it.
-  Verified in-browser (`cdp-bookmark-check.js`): free stays at 5 with a limit
-  toast, Pro goes to 6 and shows "Unlimited with Pro". No backend endpoint yet.
+  Pro gets unlimited; details-page bookmark button and dashboard list (row/table
+  listing) share it. Verified in-browser (`cdp-bookmark-check.js`): free stays
+  at 5 with a limit toast, Pro goes to 6 and shows "Unlimited with Pro". No
+  backend endpoint yet. `dashboard-chrome.tsx` needs `min-w-0` on its content
+  column + `SidebarInset` or wide tables push the whole page into horizontal
+  scroll. Backend webhook (`mentorlagbe-server/index.js`) verified with a
+  signature-valid synthetic `checkout.session.completed` event
+  (`scripts/test-webhook.js` in the server repo): user `plan` + `planUpdatedAt`
+  set, full payment doc in `payments`, idempotent replay, 400 on bad signature
+  or tampered amount, `GET /payments/status` returns paid, Pro badge/pricing
+  unlock in the browser. Real Stripe-delivered webhook still untested.
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

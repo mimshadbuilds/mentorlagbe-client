@@ -48,17 +48,17 @@ export default function DashboardHeader() {
       </nav>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <Link
-          href="#"
+        <Link href="#"
           aria-label="Notifications"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary-container"
-        >
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary-container">
           <Bell className="size-[18px]" aria-hidden="true" />
         </Link>
         {user && role && (
           <>
             <div className="hidden items-center gap-1 sm:flex">
-              {isPro && <ProBadge />}
+              <span className="mb-3">
+                {isPro && <ProBadge />}
+              </span>
               <RoleBadge role={role} />
             </div>
             <Avatar className="size-9 shrink-0 ring-2 ring-secondary/25">

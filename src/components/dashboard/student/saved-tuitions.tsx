@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Bookmark, Sparkles, Trash } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Bookmark, MapPin, Sparkles, Trash, Video } from "lucide-react";
 import { toast } from "sonner";
-import TuitionsCard from "@/components/layout/TuitionsCard";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { buttonVariants } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
 import { useProStatus } from "@/hooks/use-pro-status";
 import { useSavedTuitions } from "@/hooks/use-saved-tuitions";
@@ -103,22 +112,118 @@ export default function SavedTuitions() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {saved.map((tuition) => (
-            <div key={tuition._id} className="flex flex-col gap-2">
-              <TuitionsCard tuition={tuition} onlineIndicator="dot" />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handleRemove(tuition.title, tuition._id)}
-                className="w-full gap-1.5 text-xs font-semibold"
-              >
-                <Trash className="size-3.5" aria-hidden="true" />
-                Remove from saved
-              </Button>
-            </div>
-          ))}
+        <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-surface-container-low hover:bg-surface-container-low">
+                <TableHead className="px-space-lg py-3.5 text-xs font-semibold tracking-wider text-outline uppercase">
+                  Tuition Title &amp; Subject
+                </TableHead>
+                <TableHead className="px-space-md py-3.5 text-xs font-semibold tracking-wider text-outline uppercase">
+                  Tutor
+                </TableHead>
+                <TableHead className="px-space-md py-3.5 text-xs font-semibold tracking-wider text-outline uppercase">
+                  Mode
+                </TableHead>
+                <TableHead className="px-space-md py-3.5 text-xs font-semibold tracking-wider text-outline uppercase">
+                  Monthly Fee
+                </TableHead>
+                <TableHead className="px-space-lg py-3.5 text-right text-xs font-semibold tracking-wider text-outline uppercase">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {saved.map((tuition) => (
+                <TableRow key={tuition._id} className="hover:bg-surface-container-low/60">
+                  <TableCell className="px-space-lg py-3">
+                    <div className="flex min-w-[240px] items-center gap-3">
+                      <Image
+                        src={tuition.bannerImage}
+                        alt={tuition.title}
+                        width={56}
+                        height={40}
+                        className="size-10 shrink-0 rounded-lg object-cover"
+                      />
+                      <div className="flex min-w-0 flex-col">
+                        <Link
+                          href={`/tuitions/${tuition._id}`}
+                          className="truncate text-sm font-bold text-primary hover:underline"
+                        >
+                          {tuition.title}
+                        </Link>
+                        <div className="mt-0.5 flex items-center gap-1.5">
+                          <span className="rounded bg-surface-container px-2 py-0.5 text-xs text-on-surface-variant">
+                            {tuition.subject}
+                          </span>
+                          <span className="text-xs text-outline">{tuition.classLevel}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="px-space-md py-3 whitespace-nowrap">
+                    <span className="text-xs font-bold text-on-surface">{tuition.tutorName}</span>
+                  </TableCell>
+
+                  <TableCell className="px-space-md py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                      {tuition.mode === "Online" ? (
+                        <Video className="size-[15px] text-secondary" aria-hidden="true" />
+                      ) : (
+                        <MapPin className="size-[15px] text-secondary" aria-hidden="true" />
+                      )}
+                      <span>{tuition.mode}</span>
+                      {tuition.mode === "Offline" && tuition.location && (
+                        <span className="truncate text-outline">— {tuition.location}</span>
+                      )}
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="px-space-md py-3 whitespace-nowrap">
+                    <span className="text-sm font-bold text-primary">
+                      ৳{tuition.monthlyFee.toLocaleString("en-US")}
+                    </span>
+                    <span className="text-xs text-outline">/mo</span>
+                  </TableCell>
+
+                  <TableCell className="px-space-lg py-3 text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/tuitions/${tuition._id}`}
+                        className={cn(
+                          buttonVariants({
+                            variant: "secondary",
+                            className: "gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold",
+                          })
+                        )}
+                      >
+                        View
+                        <ArrowRight className="size-3.5" aria-hidden="true" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(tuition.title, tuition._id)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-surface-container-high px-3 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash className="size-3.5" aria-hidden="true" />
+                        Remove
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <div className="flex items-center justify-between bg-surface-container-lowest px-space-md py-3">
+            <span className="text-xs text-outline">
+              Showing {saved.length} saved tuition{saved.length === 1 ? "" : "s"}
+            </span>
+            <span className="text-xs text-outline">
+              {isPro ? "Unlimited with Pro" : `${saved.length} / ${FREE_BOOKMARK_LIMIT} free slots`}
+            </span>
+          </div>
         </div>
       )}
     </div>

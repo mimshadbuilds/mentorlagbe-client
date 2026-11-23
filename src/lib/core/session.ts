@@ -1,27 +1,46 @@
 import { headers } from "next/headers"
+import { isAPIError } from "better-auth/api"
 import { auth } from "@/lib/auth"
 
-export const getUserSession = async () => {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    })
+const isUnauthorized = (error: unknown) =>
+    isAPIError(error) && error.statusCode === 401
 
-    return session?.user || null;
+export const getUserSession = async () => {
+    try {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        })
+
+        return session?.user || null;
+    } catch (error) {
+        if (isUnauthorized(error)) return null
+        throw error
+    }
 }
 
 export const getUserToken = async () => {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    })
+    try {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        })
 
-    return session?.session?.token || null;
+        return session?.session?.token || null;
+    } catch (error) {
+        if (isUnauthorized(error)) return null
+        throw error
+    }
 }
 
 export const getServerToken = async () => {
+    try {
         const jwtToken = await auth.api.getToken({
-        headers: await headers()
-    })
-    const token = jwtToken?.token;
+            headers: await headers()
+        })
+        const token = jwtToken?.token;
 
-    return token;
+        return token;
+    } catch (error) {
+        if (isUnauthorized(error)) return null
+        throw error
+    }
 }

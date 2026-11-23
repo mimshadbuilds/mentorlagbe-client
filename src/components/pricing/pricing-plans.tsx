@@ -238,7 +238,7 @@ export default function PricingPlans({
                       {plan.price}
                     </span>
                     <span className="text-xs text-on-surface-variant">
-                      /month
+                      One-time payment
                     </span>
                   </div>
                   <span className="mb-4 inline-block rounded-full bg-tertiary-fixed px-2.5 py-0.5 text-[11px] font-bold text-on-tertiary-fixed-variant">

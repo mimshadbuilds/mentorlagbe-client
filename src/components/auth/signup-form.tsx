@@ -30,7 +30,7 @@ const SignUpForm = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        try {
+    try {
         const formData = new FormData(e.currentTarget);
 
         const name = String(formData.get("fullName") ?? "").trim();
@@ -92,7 +92,7 @@ const SignUpForm = () => {
         </header>
 
         <div className="mx-auto flex max-w-5xl flex-col px-4 py-8 sm:px-6 md:py-12 lg:flex-row">
-        <aside className="hidden flex-col justify-between rounded-t-xl bg-primary-container p-8 text-white lg:flex lg:w-[42%] lg:rounded-l-xl lg:rounded-tr-none">
+        <aside className="hidden flex-col justify-between rounded-t-xl bg-primary-container p-8 text-on-primary-container lg:flex lg:w-[42%] lg:rounded-l-xl lg:rounded-tr-none">
             <div>
             <div className="mb-10 flex items-center gap-2">
                 <Image src="/mentorlagbe-icon.png" alt="" width={40} height={40} className="size-10 rounded-lg bg-white p-1 object-contain" />
@@ -100,21 +100,21 @@ const SignUpForm = () => {
             </div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-secondary-container">Direct Academic Matching</p>
             <h1 className="font-display text-3xl font-bold leading-tight">Bridge directly with vetted academic mentors.</h1>
-            <p className="mt-4 text-sm leading-6 text-blue-100/70">No commission cuts on tuition fees, zero agent bureaucracy. Connect with top university scholars and certified educators across Bangladesh.</p>
+            <p className="mt-4 text-sm leading-6 text-on-primary-container/70">No commission cuts on tuition fees, zero agent bureaucracy. Connect with top university scholars and certified educators across Bangladesh.</p>
             <div className="mt-8 space-y-3">
                 {[
                 ["♢", "Verified Scholars & Institutions", "Curated profiles from BUET, DU, DMC, IBA, and premier English-medium faculties."],
                 ["▣", "100% Retained Honorarium", "Educators keep every single Taka earned. Absolutely zero platform commission fees."],
                 ["▱", "Direct Guardian-Tutor Dialogue", "Direct voice and chat communication for customized syllabi and trial schedules."],
                 ].map(([icon, title, description]) => (
-                <div key={title} className="flex gap-3 rounded-lg bg-white/10 p-3">
+                <div key={title} className="flex gap-3 rounded-lg bg-on-primary-container/5 p-3">
                     <span className="text-lg text-secondary-container">{icon}</span>
-                    <div><p className="text-sm font-bold">{title}</p><p className="mt-1 text-xs leading-5 text-blue-100/65">{description}</p></div>
+                    <div><p className="text-sm font-bold">{title}</p><p className="mt-1 text-xs leading-5 text-on-primary-container/65">{description}</p></div>
                 </div>
                 ))}
             </div>
             </div>
-            <div className="flex items-end justify-between text-xs text-blue-100/70"><span>● ● ● <b className="text-secondary-container">+14k</b></span><span><b className="text-white">14,800+ Active</b><br />Students & Verified Tutors</span></div>
+            <div className="flex items-end justify-between text-xs text-on-primary-container/70"><span>● ● ● <b className="text-secondary-container">+14k</b></span><span><b className="text-on-primary-container">14,800+ Active</b><br />Students & Verified Tutors</span></div>
         </aside>
 
         <section className="w-full rounded-xl bg-surface-container-lowest p-6 shadow-xl sm:p-10 lg:w-[58%] lg:rounded-l-none">
@@ -133,19 +133,18 @@ const SignUpForm = () => {
             </span>
         </div>
 
-        <div className="mb-7 grid grid-cols-2 rounded-xl bg-blue-100 p-1">
+        <div className="mb-7 grid grid-cols-2 rounded-xl bg-primary-container/10 p-1">
             <button
             type="button"
             onClick={() => setRole("student")}
             className={`flex h-12 items-center justify-center gap-2 rounded-lg border p-3 text-sm transition ${
                 role === "student"
-                ? "border-transparent bg-surface-container-lowest font-bold text-primary-container shadow-sm ring-2 ring-blue-200"
+                ? "border-transparent bg-surface-container-lowest font-bold text-primary-container shadow-sm ring-2 ring-secondary"
                 : "border-transparent bg-transparent text-muted-foreground hover:text-primary-container"
             }`}
             >
             <div
-                className="flex items-center justify-center text-secondary"
-            >
+                className="flex items-center justify-center text-secondary">
                 <svg
                 viewBox="0 0 24 24"
                 className="h-5 w-5"
@@ -166,7 +165,7 @@ const SignUpForm = () => {
             onClick={() => setRole("tutor")}
             className={`flex h-12 items-center justify-center gap-2 rounded-lg border p-3 text-sm transition ${
                 role === "tutor"
-                ? "border-transparent bg-surface-container-lowest font-bold text-primary-container shadow-sm ring-2 ring-blue-200"
+                ? "border-transparent bg-surface-container-lowest font-bold text-primary-container shadow-sm ring-2 ring-secondary"
                 : "border-transparent bg-transparent text-muted-foreground hover:text-primary-container"
             }`}
             >
@@ -189,16 +188,14 @@ const SignUpForm = () => {
             </button>
         </div>
 
-        <div className="mb-4 flex items-center justify-between rounded-lg bg-blue-50 px-4 py-3 text-xs text-primary-container">
+        <div className="mb-4 flex items-center justify-between rounded-lg bg-primary-container/10 px-4 py-3 text-xs text-primary-container">
             <span><span className="mr-2 text-base text-secondary">✿</span>Default Plan: <strong>Free Tier ($0/month)</strong> — upgrade anytime</span>
             <span className="rounded-full bg-secondary-container px-2.5 py-0.5 font-semibold text-on-secondary-container">Free</span>
         </div>
 
-        <button
-            type="button"
+        <button type="button"
             onClick={handleGoogleSignUp}
-            className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-50 text-sm font-semibold text-primary-container transition hover:bg-blue-100"
-        >
+            className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-primary-container/10 text-sm font-semibold text-primary-container transition hover:bg-primary-container/20">
             <svg viewBox="0 0 48 48" className="h-5 w-5">
                 <path
                     fill="#EA4335"
@@ -225,7 +222,7 @@ const SignUpForm = () => {
 
         <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-blue-100" />
+            <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
             <span className="bg-surface-container-lowest px-3 text-xs font-medium uppercase tracking-wide text-primary-container">
@@ -249,7 +246,7 @@ const SignUpForm = () => {
                 placeholder="e.g. Tanvir Ahmed"
                 autoComplete="name"
                 required
-                className="h-12 w-full rounded-lg border border-transparent bg-blue-50 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
+                className="h-12 w-full rounded-lg border border-transparent bg-primary-container/10 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
             />
             </div>
 
@@ -265,7 +262,7 @@ const SignUpForm = () => {
                 placeholder="name@example.com"
                 autoComplete="email"
                 required
-                className="h-12 w-full rounded-lg border border-transparent bg-blue-50 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
+                className="h-12 w-full rounded-lg border border-transparent bg-primary-container/10 px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
             />
             </div>
 
@@ -291,7 +288,7 @@ const SignUpForm = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-12 w-full rounded-lg border border-transparent bg-blue-50 px-4 pr-12 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
+                className="h-12 w-full rounded-lg border border-transparent bg-primary-container/10 px-4 pr-12 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/10"
                 />
 
                 <button

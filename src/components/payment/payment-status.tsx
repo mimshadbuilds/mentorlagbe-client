@@ -370,7 +370,7 @@ export default function PaymentStatus({
         <span aria-hidden="true">•</span>
         {cancelled
           ? "MentorLagbe Guarantee"
-          : "Auto-renewal can be modified anytime in Account Settings"}
+          : "Lifetime Pro access — no renewal"}
       </p>
     </div>
   );

@@ -102,7 +102,7 @@ const PricingCards = () => {
                             $15
                         </span>
                         <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
-                            /mo for Tutors
+                            one-time for Tutors
                         </span>
                         </div>
                         <span className="text-[11px] leading-[14px] text-on-surface-variant">
@@ -113,7 +113,7 @@ const PricingCards = () => {
                             $10
                         </span>
                         <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
-                            /mo for Students
+                            one-time for Students
                         </span>
                         </div>
                     </div>

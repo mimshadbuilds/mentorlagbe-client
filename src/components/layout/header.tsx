@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import {
   LayoutDashboard,
@@ -35,8 +35,17 @@ const baseNavLinks = [
 
 const dashboardLink = { label: "Dashboard", href: "/dashboard" };
 
+const subscribeToHydration = () => () => {};
+const getHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    getHydrationSnapshot,
+    getServerHydrationSnapshot
+  );
   const isDark = resolvedTheme === "dark";
 
   return (
@@ -45,7 +54,11 @@ function ThemeToggle() {
       size="icon-sm"
       aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? "light" : "dark")}>
-      {isDark ? <Moon className="size-4" /> : <Sun className="size-4" />}
+      {mounted ? (
+        isDark ? <Moon className="size-4" /> : <Sun className="size-4" />
+      ) : (
+        <span aria-hidden="true" className="size-4" />
+      )}
     </Button>
   );
 }

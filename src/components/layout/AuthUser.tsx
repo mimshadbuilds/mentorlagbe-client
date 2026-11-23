@@ -3,11 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronDown, LayoutDashboard, LogOut, UserRound } from "lucide-react";
+import {
+  BadgeCheck,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 import { authClient, useSession } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useProStatus } from "@/hooks/use-pro-status";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +35,15 @@ export function RoleBadge({ role }: { role: UserRole }) {
   return (
     <Badge className="shrink-0 bg-secondary-container font-semibold tracking-wide text-secondary uppercase hover:bg-secondary-container">
       {roleLabel[role]}
+    </Badge>
+  );
+}
+
+export function ProBadge() {
+  return (
+    <Badge className="shrink-0 gap-1 bg-tertiary-fixed font-bold tracking-wide text-on-tertiary-fixed-variant uppercase hover:bg-tertiary-fixed">
+      <BadgeCheck className="size-3" aria-hidden="true" />
+      Pro
     </Badge>
   );
 }
@@ -54,6 +70,7 @@ const AuthUser = () => {
   const { data: session } = useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const user = session?.user;
+  const isPro = useProStatus(user?.id);
 
   if (!user) {
     return (
@@ -105,6 +122,7 @@ const AuthUser = () => {
             {(user.name ?? "U").charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
+        {isPro && <ProBadge />}
         <span className="hidden max-w-32 truncate text-sm font-semibold text-foreground md:block">
           {user.name}
         </span>
@@ -121,7 +139,10 @@ const AuthUser = () => {
               {user.email}
             </p>
           </div>
-          <RoleBadge role={role} />
+          <div className="flex items-center gap-1">
+            {isPro && <ProBadge />}
+            <RoleBadge role={role} />
+          </div>
         </div>
 
         <DropdownMenuSeparator />

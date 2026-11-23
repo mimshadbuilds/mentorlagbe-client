@@ -1,10 +1,5 @@
-import DashboardStub from "@/components/dashboard/shared/DashboardStub";
+import SavedTuitions from "@/components/dashboard/student/saved-tuitions";
 
 export default function SavedTuitionsPage() {
-    return (
-    <DashboardStub
-        title="Saved Tuitions"
-        description=""
-    />
-    );
+  return <SavedTuitions />;
 }

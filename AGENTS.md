@@ -133,8 +133,16 @@ token from `authHeader()` 401s against backend `verifyToken`.
   page verifies `GET /payments/status?session_id=…` server-side and shows
   confirmed / processing / error states; the URL alone never grants Pro. Cancel
   page never shows a receipt. Admin table uses per-record currency and
-  paymentStatus. Verified by `check-stripe-frontend.ps1` (17/17) and
-  `check-pricing-payment.ps1` (19/19).
+  paymentStatus. Pro pricing says "One-time payment" (matches backend's
+  `mode: "payment"`). Verified by `check-stripe-frontend.ps1` (17/17),
+  `check-pricing-payment.ps1` (19/19) and `check-pro-unlock.ps1` (11/11 —
+  Pro role/plan state, dashboard unlock, no duplicate checkout). A gold PRO
+  badge is rendered in both the site and dashboard headers from `GET /users/me`
+  (`useProStatus`); verified in-browser with a Pro student. Saved tuitions is
+  implemented with a per-user localStorage store: free students get 5 bookmarks,
+  Pro gets unlimited; details-page bookmark button and dashboard list share it.
+  Verified in-browser (`cdp-bookmark-check.js`): free stays at 5 with a limit
+  toast, Pro goes to 6 and shows "Unlimited with Pro". No backend endpoint yet.
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

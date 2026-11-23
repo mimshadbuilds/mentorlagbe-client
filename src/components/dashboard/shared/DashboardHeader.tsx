@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, ChevronRight } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import { RoleBadge, type UserRole } from "@/components/layout/AuthUser";
+import { ProBadge, RoleBadge, type UserRole } from "@/components/layout/AuthUser";
+import { useProStatus } from "@/hooks/use-pro-status";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -25,6 +26,7 @@ export default function DashboardHeader() {
   const { data: session } = useSession();
   const user = session?.user ?? null;
   const role = user ? (user.role as UserRole) : null;
+  const isPro = useProStatus(user?.id);
 
   return (
     <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-surface/90 px-space-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl sm:px-space-lg lg:px-space-xl">
@@ -55,7 +57,8 @@ export default function DashboardHeader() {
         </Link>
         {user && role && (
           <>
-            <div className="hidden sm:block">
+            <div className="hidden items-center gap-1 sm:flex">
+              {isPro && <ProBadge />}
               <RoleBadge role={role} />
             </div>
             <Avatar className="size-9 shrink-0 ring-2 ring-secondary/25">

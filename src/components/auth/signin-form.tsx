@@ -97,7 +97,7 @@ import {
         </header>
 
         <div className="mx-auto flex max-w-5xl flex-col px-4 py-8 sm:px-6 md:py-12 lg:flex-row">
-            <aside className="hidden flex-col justify-between rounded-t-xl bg-primary-container p-8 text-white lg:flex lg:w-[42%] lg:rounded-l-xl lg:rounded-tr-none">
+            <aside className="hidden flex-col justify-between rounded-t-xl bg-primary-container p-8 text-on-primary-container lg:flex lg:w-[42%] lg:rounded-l-xl lg:rounded-tr-none">
             <div>
                 <div className="mb-10 flex items-center gap-2">
                 <Image
@@ -120,7 +120,7 @@ import {
                 <h1 className="font-display text-3xl font-bold leading-tight">
                 Welcome back to Bangladesh&apos;s premier academic tuition network
                 </h1>
-                <p className="mt-4 text-sm leading-6 text-blue-100/70">
+                <p className="mt-4 text-sm leading-6 text-on-primary-container/70">
                 Structured governance, instant verified matches, and professional
                 academic mentors tailored for peak curricula.
                 </p>
@@ -148,7 +148,7 @@ import {
                     </span>
                     <div>
                         <p className="text-sm font-bold">{title}</p>
-                        <p className="mt-1 text-xs leading-5 text-blue-100/65">
+                        <p className="mt-1 text-xs leading-5 text-on-primary-container/65">
                         {description}
                         </p>
                     </div>
@@ -156,7 +156,7 @@ import {
                 ))}
                 </div>
             </div>
-            <div className="rounded-lg bg-white/10 p-4 text-xs italic text-blue-100/80">
+            <div className="rounded-lg bg-on-primary-container/5 p-4 text-xs italic text-on-primary-container/80">
                 ★★★★★
                 <br />
                 “Found my HSC Higher Math mentor from BUET CSE within 24 hours.”
@@ -282,7 +282,7 @@ import {
                 <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-blue-50 text-sm font-semibold text-primary-container transition hover:bg-blue-100"
+                    className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-primary-container/10 text-sm font-semibold text-primary-container transition hover:bg-primary-container/20"
                 >
                     <svg viewBox="0 0 48 48" className="h-5 w-5">
                     <path

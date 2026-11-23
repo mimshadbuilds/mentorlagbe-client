@@ -1,7 +1,6 @@
 import SignUpForm from "@/components/auth/signup-form";
 
-const SignUpPage = () => {
-    
+const SignUpPage = () => { 
     return <SignUpForm />
 };
 

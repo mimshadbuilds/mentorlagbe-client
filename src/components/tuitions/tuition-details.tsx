@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -20,6 +19,10 @@ import {
 import { toast } from "sonner";
 import { cn } from "cn";
 import type { ITuition } from "@/lib/actions/tuition-query";
+import { useSession } from "@/lib/auth-client";
+import { useProStatus } from "@/hooks/use-pro-status";
+import { useSavedTuitions } from "@/hooks/use-saved-tuitions";
+import { toggleSavedTuition } from "@/lib/data/saved-tuitions";
 import ApplyTuitionDialog from "./apply-tuition-dialog";
 
 function DetailField({
@@ -46,7 +49,12 @@ function DetailField({
 }
 
 export default function TuitionDetails({ tuition }: { tuition: ITuition }) {
-  const [saved, setSaved] = useState(false);
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+  const role = session?.user?.role;
+  const isPro = useProStatus(userId);
+  const savedTuitions = useSavedTuitions(userId);
+  const saved = savedTuitions.some((item) => item._id === tuition._id);
 
   const inPerson = tuition.mode === "Offline";
   const initial = tuition.tutorName.replace(/^(Dr\.|Engr\.|Md\.)\s*/, "").charAt(0);
@@ -79,10 +87,35 @@ export default function TuitionDetails({ tuition }: { tuition: ITuition }) {
   };
 
   const handleSave = () => {
-    setSaved((prev) => {
-      toast.success(prev ? "Removed from saved tuitions" : "Saved to your list");
-      return !prev;
-    });
+    if (!userId || role !== "student") {
+      toast.error("Sign in with a student account to save tuitions.");
+      return;
+    }
+
+    const result = toggleSavedTuition(
+      userId,
+      {
+        _id: tuition._id,
+        title: tuition.title,
+        subject: tuition.subject,
+        classLevel: tuition.classLevel,
+        mode: tuition.mode,
+        location: tuition.location,
+        monthlyFee: tuition.monthlyFee,
+        tutorName: tuition.tutorName,
+        bannerImage: tuition.bannerImage,
+      },
+      isPro
+    );
+
+    if (result.limitReached) {
+      toast.error("Free plan allows 5 saved tuitions. Upgrade to Pro for unlimited bookmarks.");
+      return;
+    }
+
+    toast.success(
+      result.saved ? "Saved to your list" : "Removed from saved tuitions"
+    );
   };
 
   return (
@@ -127,7 +160,7 @@ export default function TuitionDetails({ tuition }: { tuition: ITuition }) {
               </button>
               <button
                 type="button"
-                aria-label="Save Bookmark"
+                aria-label={saved ? "Remove Bookmark" : "Save Bookmark"}
                 onClick={handleSave}
                 className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-all hover:bg-white">
                 <Bookmark

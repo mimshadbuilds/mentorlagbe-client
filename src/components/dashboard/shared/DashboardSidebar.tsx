@@ -29,7 +29,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { dashboardNav,isActivePath, profileNavItem, roleLabel, type IDashboardUser } from "../../../app/types/config";
+import { dashboardNav, isActivePath, profileNavItem, quickLinks, roleLabel, type IDashboardUser } from "../../../app/types/config";
 
 export default function DashboardSidebar({ user }: { user: IDashboardUser }) {
   const pathname = usePathname();
@@ -97,6 +97,29 @@ export default function DashboardSidebar({ user }: { user: IDashboardUser }) {
                   <SidebarMenuButton
                     tooltip={item.label}
                     isActive={isActivePath(pathname, item.href)}
+                    render={<Link href={item.href} onClick={closeMobile} />}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Quick Links</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {quickLinks.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    tooltip={item.label}
+                    isActive={
+                      item.href === "/"
+                        ? pathname === "/"
+                        : isActivePath(pathname, item.href)
+                    }
                     render={<Link href={item.href} onClick={closeMobile} />}>
                     <item.icon />
                     <span>{item.label}</span>

@@ -151,6 +151,20 @@ token from `authHeader()` 401s against backend `verifyToken`.
   set, full payment doc in `payments`, idempotent replay, 400 on bad signature
   or tampered amount, `GET /payments/status` returns paid, Pro badge/pricing
   unlock in the browser. Real Stripe-delivered webhook still untested.
+- **Quick Links + workflow redesign** (user-requested, docx 88 + 111) — the
+  dashboard sidebar has a "Quick Links" group below Workspace shared by all
+  roles (Homepage `/`, Update Profile `/dashboard/profile`, Pro Plans
+  `/pricing`); `isActivePath` is bypassed for `/` so it never marks every route
+  active. The homepage "How MentorLagbe Works" section is a unified 4-step flow
+  (post → browse → apply → match) with connector arrows that rotate for mobile.
+  Verified in Chrome at 1440px and 390px; no horizontal overflow.
+- **Hero + final CTA redesign** (user-supplied `Temp\code.html`) — hero is now
+  the design's 7/5 grid with an integrated 4-cell filter card and floating
+  image cards (mentor pill, NCTB & CAIE badge, batch snapshot); final CTA is a
+  contained `bg-primary` rounded banner with copy left / buttons right.
+  All original text preserved. Verified at 1440px and 390px in dark mode;
+  `docW == clientW`. Note the Button `outline` variant injects
+  `dark:bg-input/30`, so the white CTA button uses no variant.
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

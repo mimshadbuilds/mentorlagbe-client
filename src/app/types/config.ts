@@ -3,8 +3,10 @@ import {
   Banknote,
   Bookmark,
   ClipboardList,
+  CreditCard,
   FilePen,
   FileText,
+  House,
   LayoutGrid,
   Send,
   UserRound,
@@ -57,6 +59,12 @@ export const profileNavItem: IDashboardNavItem = {
   href: "/dashboard/profile",
   icon: UserRound,
 };
+
+export const quickLinks: IDashboardNavItem[] = [
+  { label: "Homepage", href: "/", icon: House },
+  { label: "Update Profile", href: "/dashboard/profile", icon: UserRound },
+  { label: "Pro Plans", href: "/pricing", icon: CreditCard },
+];
 
 export function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);

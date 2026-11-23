@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
@@ -28,9 +27,8 @@ import {
         e.preventDefault();
         setIsSubmitting(true);
 
-        try {
+    try {
         const formData = new FormData(e.currentTarget);
-
         const email = String(formData.get("email") ?? "").trim();
         const password = String(formData.get("password") ?? "");
 

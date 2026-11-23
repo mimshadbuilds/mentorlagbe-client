@@ -18,12 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createTuition } from "@/lib/actions/tution";
 import TuitionBannerUpload from "@/components/dashboard/tutor/tuition-banner-upload";
-import {
-  SUBJECT_OPTIONS,
-  CLASS_LEVEL_OPTIONS,
-  DAYS_OPTIONS,
-} from "@/lib/constants/tuition-options";
-
+import { SUBJECT_OPTIONS, CLASS_LEVEL_OPTIONS, DAYS_OPTIONS } from "@/lib/constants/tuition-options";
 
 const presets = [
   "/tuitions/tuition-7.jpg",
@@ -225,8 +220,7 @@ export default function PostTuitionForm() {
                       mode === option
                         ? "border-secondary bg-secondary-container text-on-secondary-container"
                         : "border-surface-container bg-surface-container-lowest hover:border-secondary"
-                    )}
-                  >
+                    )}>
                     <input
                       type="radio"
                       name="mode"

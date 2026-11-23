@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
@@ -37,7 +36,7 @@ const SignUpForm = () => {
         const email = String(formData.get("email") ?? "").trim();
         const password = String(formData.get("password") ?? "");
 
-        const signupPayload = {
+        const signupPayload: Parameters<typeof signUp.email>[0] = {
             name,
             email,
             password,
@@ -46,7 +45,7 @@ const SignUpForm = () => {
         };
 
         const { data, error } = await signUp.email(
-            signupPayload as Parameters<typeof signUp.email>[0]
+            signupPayload 
         );
 
         if (error) {

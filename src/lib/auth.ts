@@ -3,8 +3,18 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { jwt } from "better-auth/plugins"
 
+const mongoUri = process.env.MONGODB_URI
+if (!mongoUri) {
+    throw new Error("MONGODB_URI is not configured.")
+}
 
-const client = new MongoClient(process.env.MONGODB_URI as string)
+type MongoGlobal = typeof globalThis & {
+    mentorlagbeMongoClient?: MongoClient
+}
+
+const globalForMongo = globalThis as MongoGlobal
+const client = globalForMongo.mentorlagbeMongoClient ?? new MongoClient(mongoUri)
+globalForMongo.mentorlagbeMongoClient = client
 const db = client.db('mentorlagbeDB')
 
 export const auth = betterAuth({

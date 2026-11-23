@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -46,8 +45,7 @@ function StatusPill({ status }: { status: TApplicationStatus }) {
           "bg-secondary-container text-on-secondary-container hover:bg-secondary-container",
         status === "rejected" &&
           "bg-destructive/10 text-destructive hover:bg-destructive/10"
-      )}
-    >
+      )}>
       {status === "pending"
         ? "Pending Review"
         : status === "accepted"
@@ -70,8 +68,7 @@ export default function Applicants({ applicants }: { applicants: IApplication[] 
     rejected: applicants.filter((item) => item.status === "rejected").length,
   };
 
-  const visible = useMemo(
-    () =>
+  const visible = useMemo(() =>
       applicants.filter((applicant) =>
         (filter === "all" || applicant.status === filter) &&
         (query.trim() === "" ||
@@ -90,8 +87,7 @@ export default function Applicants({ applicants }: { applicants: IApplication[] 
       await setApplicationStatus(id, status);
       toast.success(
         status === "accepted" ? "Application accepted" : "Application rejected",
-        {
-          description:
+        {description:
             status === "accepted"
               ? "The student can now see your contact details."
               : "The student has been notified of the decision.",
@@ -156,8 +152,7 @@ export default function Applicants({ applicants }: { applicants: IApplication[] 
                 filter === key
                   ? "bg-secondary-container font-semibold text-on-secondary-container"
                   : "text-on-surface-variant hover:bg-surface-container"
-              )}
-            >
+              )}>
               {label} ({key === "all" ? stats.total : stats[key]})
             </button>
           ))}

@@ -1,12 +1,6 @@
 import { Construction } from "lucide-react";
 
-export default function DashboardStub({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+export default function DashboardStub({ title, description }: { title: string; description: string }) {
   return (
     <div className="flex flex-col gap-4">
       <div>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -52,12 +51,7 @@ function tutorInitials(email: string): string {
   return `${words[0]?.[0] ?? ""}${words[1]?.[0] ?? ""}`.toUpperCase();
 }
 
-function QuickMetric({
-  icon: Icon,
-  value,
-  label,
-  chipClassName,
-}: {
+function QuickMetric({ icon: Icon, value, label, chipClassName }: {
   icon: typeof Archive;
   value: number;
   label: string;
@@ -105,11 +99,7 @@ function StatusBadge({ status }: { status: TApplicationStatus }) {
   );
 }
 
-export default function ApplicationsTable({
-  applications,
-}: {
-  applications: IApplication[];
-}) {
+export default function ApplicationsTable({ applications }: { applications: IApplication[] }) {
   const router = useRouter();
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
@@ -124,8 +114,7 @@ export default function ApplicationsTable({
     rejected: applications.filter((item) => item.status === "rejected").length,
   };
 
-  const filtered = useMemo(
-    () =>
+  const filtered = useMemo(() =>
       applications.filter(
         (application) =>
           (filter === "all" || application.status === filter) &&

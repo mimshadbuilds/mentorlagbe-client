@@ -21,17 +21,13 @@ import type { ITuition } from "@/lib/actions/tuition-query";
 import type { IApplication } from "@/lib/types/application";
 import type { TUserPlan } from "@/lib/types/payment";
 
-type TutorOverviewProps = {
-  tuitions: ITuition[];
+type TutorOverviewProps = { 
+  tuitions: ITuition[]; 
   applications: IApplication[];
   plan: TUserPlan;
 };
 
-export default function TutorOverview({
-  tuitions,
-  applications,
-  plan,
-}: TutorOverviewProps) {
+export default function TutorOverview({ tuitions, applications, plan }: TutorOverviewProps) {
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const active = tuitions.filter((tuition) => tuition.isActive).length;
   const pending = applications.filter((item) => item.status === "pending").length;
@@ -164,8 +160,7 @@ export default function TutorOverview({
                 type="button"
                 disabled={checkoutBusy}
                 onClick={handleUpgrade}
-                className="mt-2 inline-flex items-center gap-1.5 rounded bg-secondary px-2.5 py-1 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50"
-              >
+                className="mt-2 inline-flex items-center gap-1.5 rounded bg-secondary px-2.5 py-1 text-xs font-semibold text-on-secondary shadow-sm transition-all hover:bg-[#156057] disabled:opacity-50">
                 {checkoutBusy ? "Opening Stripe..." : "Upgrade to PRO ($15)"}
                 <ArrowRight className="size-3.5" aria-hidden="true" />
               </button>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,7 @@ import {
   Plus,
   RotateCcw,
   Search,
-  Trash,
+  Trash
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
@@ -26,7 +25,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,17 +34,13 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  deleteTuition,
-  setTuitionActive,
-  updateTuition,
-} from "@/lib/actions/tution";
+import { deleteTuition, setTuitionActive, updateTuition } from "@/lib/actions/tution";
 import type { ITuition } from "@/lib/actions/tuition-query";
 import type { IApplication } from "@/lib/types/application";
 

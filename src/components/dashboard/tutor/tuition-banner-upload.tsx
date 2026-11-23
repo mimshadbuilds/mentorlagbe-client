@@ -5,13 +5,12 @@ import { ImagePlus, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/actions/image";
-
 interface TuitionBannerUploadProps {
     onBannerChange: (imageUrl: string) => void;
     disabled?: boolean;
 }
 
-export default function TuitionBannerUpload({onBannerChange, disabled = false }: TuitionBannerUploadProps) {
+export default function TuitionBannerUpload({ onBannerChange, disabled = false }: TuitionBannerUploadProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -25,12 +24,12 @@ export default function TuitionBannerUpload({onBannerChange, disabled = false }:
         "image/gif",
         ];
 
-        if (!allowedTypes.includes(file.type)) {
+        if(!allowedTypes.includes(file.type)) {
         toast.error("Only JPEG, PNG, WEBP, and GIF images are allowed.");
         return;
         }
 
-        if (file.size > 5 * 1024 * 1024) {
+        if(file.size > 5 * 1024 * 1024) {
         toast.error("Image size must be less than 5MB.");
         return;
         }
@@ -52,7 +51,7 @@ export default function TuitionBannerUpload({onBannerChange, disabled = false }:
         } finally {
         setIsUploading(false);
 
-        if (inputRef.current) {
+        if(inputRef.current) {
             inputRef.current.value = "";
         }
         }

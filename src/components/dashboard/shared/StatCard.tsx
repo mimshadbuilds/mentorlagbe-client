@@ -7,11 +7,6 @@ export interface StatCardPill {
   className?: string;
 }
 
-/**
- * Reusable dashboard stat card (docx lines 99/102/107) — cloned from the
- * student overview design's 4-column bento. The plan card overrides the
- * default middle section via `children`.
- */
 export default function StatCard({
   label,
   value,
@@ -34,7 +29,6 @@ export default function StatCard({
   icon?: LucideIcon;
   iconChipClassName?: string;
   valueClassName?: string;
-  /** 0–100 bar width, omit for no progress bar. */
   progress?: number;
   progressClassName?: string;
   className?: string;
@@ -47,7 +41,6 @@ export default function StatCard({
         className
       )}
     >
-      {/* Label + badge / icon chip */}
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wider text-outline uppercase">
           {label}
@@ -78,21 +71,18 @@ export default function StatCard({
 
       {children ?? (
         <>
-          {/* Value + footnote */}
           <div className="mt-4 flex items-baseline justify-between gap-2">
             <span
               className={cn(
                 "text-3xl font-bold tracking-tight text-primary",
                 valueClassName
-              )}
-            >
+              )}>
               {value}
             </span>
             {footnote && (
               <span className={cn("text-xs", footnoteClassName)}>{footnote}</span>
             )}
           </div>
-          {/* Progress bar */}
           {progress !== undefined && (
             <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-surface-container">
               <div

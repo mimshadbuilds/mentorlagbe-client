@@ -69,11 +69,7 @@ type PricingPlansProps = {
   plan: TUserPlan;
 };
 
-export default function PricingPlans({
-  signedIn,
-  role,
-  plan,
-}: PricingPlansProps) {
+export default function PricingPlans({ signedIn, role, plan }: PricingPlansProps) {
   const [busyPlan, setBusyPlan] = useState<TProPlan | null>(null);
 
   const handleCheckout = async (planId: TProPlan) => {
@@ -96,13 +92,11 @@ export default function PricingPlans({
   const proCta = (item: (typeof plans)[number]) => {
     if (!signedIn) {
       return (
-        <Link
-          href="/sign-in?redirectTo=/pricing"
+        <Link href="/sign-in?redirectTo=/pricing"
           className={buttonVariants({
             variant: "secondary",
             className: "mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold",
-          })}
-        >
+          })}>
           Sign In to Upgrade
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
@@ -139,8 +133,7 @@ export default function PricingPlans({
         variant="secondary"
         disabled={busyPlan !== null}
         onClick={() => handleCheckout(item.planId)}
-        className="mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold"
-      >
+        className="mt-6 w-full gap-2 rounded-xl py-3 text-xs font-bold">
         {busyPlan === item.planId ? "Opening Stripe..." : "Subscribe with Stripe"}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Button>
@@ -167,8 +160,7 @@ export default function PricingPlans({
         {plans.map((plan) => (
           <section
             key={plan.planId}
-            className="flex flex-col gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm"
-          >
+            className="flex flex-col gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
             <div className="flex items-start gap-space-sm">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-secondary">
                 {plan.role === "tutor" ? (
@@ -205,8 +197,7 @@ export default function PricingPlans({
                     {plan.freeFeatures.map((feature) => (
                       <li
                         key={feature}
-                        className="flex items-start gap-2 text-[13px] leading-5 text-on-surface-variant"
-                      >
+                        className="flex items-start gap-2 text-[13px] leading-5 text-on-surface-variant">
                         <CircleCheck
                           className="mt-0.5 size-4 shrink-0 text-secondary"
                           aria-hidden="true"
@@ -221,8 +212,7 @@ export default function PricingPlans({
                   className={buttonVariants({
                     variant: "outline",
                     className: "mt-6 w-full rounded-xl py-3 text-xs font-bold",
-                  })}
-                >
+                  })}>
                   Get Started Free
                 </Link>
               </div>
@@ -248,8 +238,7 @@ export default function PricingPlans({
                     {plan.proFeatures.map((feature) => (
                       <li
                         key={feature}
-                        className="flex items-start gap-2 text-[13px] leading-5 text-on-surface-variant"
-                      >
+                        className="flex items-start gap-2 text-[13px] leading-5 text-on-surface-variant">
                         <CircleCheck
                           className="mt-0.5 size-4 shrink-0 text-secondary"
                           aria-hidden="true"

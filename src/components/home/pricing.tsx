@@ -1,7 +1,7 @@
 import { ArrowRight, CircleCheck, Sparkles } from "lucide-react";
-
+import Link from "next/link";
 import { cn } from "cn";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 const starterFeatures = [
     "Up to 2 tuition posts (Tutor)",
@@ -70,8 +70,7 @@ const PricingCards = () => {
                     <Button
                     type="button"
                     variant="outline"
-                    className="w-full rounded-xl border-outline-variant bg-surface-container-lowest py-3 text-xs font-bold text-primary-container shadow-sm hover:bg-surface-container-low dark:border-outline-variant dark:bg-surface-container-lowest dark:hover:bg-surface-container-low"
-                    >
+                    className="w-full rounded-xl border-outline-variant bg-surface-container-lowest py-3 text-xs font-bold text-primary-container shadow-sm hover:bg-surface-container-low dark:border-outline-variant dark:bg-surface-container-lowest dark:hover:bg-surface-container-low"    >
                     Get Started Free
                     </Button>
                 </div>
@@ -82,7 +81,7 @@ const PricingCards = () => {
                     Recommended
                     </span>
 
-                    <div>
+                <div>
                     <div className="mb-3 flex items-center justify-between gap-2 pt-1">
                         <h3 className="font-display text-xl font-bold text-primary-container">
                         MentorLagbe PRO
@@ -98,23 +97,23 @@ const PricingCards = () => {
 
                     <div className="mb-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                         <div className="flex items-baseline gap-1">
-                        <span className="font-display text-4xl font-extrabold text-secondary">
-                            $15
-                        </span>
-                        <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
-                            one-time for Tutors
-                        </span>
+                            <span className="font-display text-4xl font-extrabold text-secondary">
+                                $15
+                            </span>
+                            <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
+                                one-time for Tutors
+                            </span>
                         </div>
                         <span className="text-[11px] leading-[14px] text-on-surface-variant">
                         or
                         </span>
                         <div className="flex items-baseline gap-1">
-                        <span className="font-display text-2xl font-extrabold text-primary-container">
-                            $10
-                        </span>
-                        <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
-                            one-time for Students
-                        </span>
+                            <span className="font-display text-2xl font-extrabold text-primary-container">
+                                $10
+                            </span>
+                            <span className="text-[11px] leading-[14px] font-medium text-on-surface-variant">
+                                one-time for Students
+                            </span>
                         </div>
                     </div>
 
@@ -135,13 +134,15 @@ const PricingCards = () => {
                     </ul>
                     </div>
 
-                    <Button
-                    type="button"
-                    variant="secondary"
-                    className="w-full gap-2 rounded-xl py-3 text-xs font-bold shadow-md hover:bg-secondary/90">
-                    Upgrade to Pro
-                    <ArrowRight className="size-[18px]" />
-                    </Button>
+                    <Link href="/pricing"
+                        className={buttonVariants({
+                            variant: "secondary",
+                            className:
+                                "w-full gap-2 rounded-xl py-3 text-xs font-bold shadow-md hover:bg-secondary/90",
+                        })}>
+                        Upgrade to Pro
+                        <ArrowRight className="size-[18px]" />
+                    </Link>
                 </div>
                 </div>
             </div>

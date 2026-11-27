@@ -1,13 +1,7 @@
 import type { SVGProps } from "react";
 
-/**
- * Brand icons — lucide-react does not ship brand glyphs.
- * All paths are 24x24 and use currentColor so they inherit text colors.
- */
-
 type Props = SVGProps<SVGSVGElement>;
 
-/** New X (formerly Twitter) logo — required by the project spec. */
 export function XIcon(props: Props) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>

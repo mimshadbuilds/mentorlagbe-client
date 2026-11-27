@@ -165,6 +165,18 @@ token from `authHeader()` 401s against backend `verifyToken`.
   All original text preserved. Verified at 1440px and 390px in dark mode;
   `docW == clientW`. Note the Button `outline` variant injects
   `dark:bg-input/30`, so the white CTA button uses no variant.
+- **Vercel session fix (user's solution)** — `src/lib/auth.ts` now eagerly
+  `connect()`s one module-level `MongoClient` (`maxPoolSize: 10`) with a
+  top-level `await` and exports the usual singleton `auth`; `autoSignIn: false`
+  added (signup form already redirects to /sign-in). Also added
+  `trustedOrigins: ["https://mentorlagbe-client-*.vercel.app"]` so preview
+  deployments pass Better Auth's origin check (Vercel env pins
+  `BETTER_AUTH_URL` to the `olive` domain). Verified: preview soak + production
+  soak on `olive` clean — no `MongoTopologyClosedError`, no
+  `Failed to get session`; profile update CORS only fails from preview hosts
+  (backend `CLIENT_URL` = olive only — by design, untouched). Temporary
+  `close`/`topologyClosed` diagnostics listeners added during testing and
+  removed after the fix proved out. Not committed.
 - **Next:** Stripe checkout/webhooks (docx Challenge 2) and ImgBB direct upload
   (Challenge 3, another session already committed imgbb work). From Phase 11 the
   backend still owes: `GET /admin/stats`, `GET /admin/users`,

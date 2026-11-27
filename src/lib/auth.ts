@@ -4,49 +4,24 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { jwt } from "better-auth/plugins"
 
 const mongoUri = process.env.MONGODB_URI
-if (!mongoUri) {
-    throw new Error("MONGODB_URI is not configured.")
-}
 
-type MongoGlobal = typeof globalThis & {
-    mentorlagbeMongoClient?: MongoClient
-    mentorlagbeMongoDiagnosticsAttached?: boolean
-}
-
-const globalForMongo = globalThis as MongoGlobal
-const client = globalForMongo.mentorlagbeMongoClient ?? new MongoClient(mongoUri)
-globalForMongo.mentorlagbeMongoClient = client
-
-if (!globalForMongo.mentorlagbeMongoDiagnosticsAttached) {
-    const runtimeContext = {
-        pid: process.pid,
-        region: process.env.VERCEL_REGION ?? "local",
-        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
+    if (!mongoUri) {
+        throw new Error("MONGODB_URI is not configured.")
     }
 
-    client.on("close", () => {
-        console.error("[MongoDB diagnostics] MongoClient close event", {
-            ...runtimeContext,
-            occurredAt: new Date().toISOString(),
-        })
-    })
+const client = new MongoClient(mongoUri, {
+    maxPoolSize: 10,
+});
 
-    client.on("topologyClosed", (event) => {
-        console.error("[MongoDB diagnostics] MongoDB topologyClosed event", {
-            ...runtimeContext,
-            topologyId: event.topologyId,
-            occurredAt: new Date().toISOString(),
-        })
-    })
+const clientPromise = client.connect();
 
-    globalForMongo.mentorlagbeMongoDiagnosticsAttached = true
-}
-
-const db = client.db('mentorlagbeDB')
+const db = (await clientPromise).db('mentorlagbeDB')
 
 export const auth = betterAuth({
+    // trustedOrigins: ["https://mentorlagbe-client-*.vercel.app"],
     emailAndPassword: { 
-        enabled: true, 
+        enabled: true,
+        autoSignIn: false, 
     },
     socialProviders: {
         google: { 
